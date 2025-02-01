@@ -1,0 +1,12 @@
+.cache/*
+.vscode/*
+bin/*
+build/*
+cmake/*
+**/.clangd
+.vscode
+build
+bin
+cmake
+.cache
+__cmake_systeminformation
