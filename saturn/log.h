@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -248,6 +249,23 @@ namespace saturn {
         std::list<LogAppender::ptr> m_appenders;
     };
 
+    class LoggerManager {
+    public:
+        static LoggerManager* getInstance() {
+            static LoggerManager* instance = new LoggerManager();
+            return instance; 
+        }
+        Logger::ptr getLogger(std::string name = "root") {
+            return m_loggers.contains(name) ? m_loggers[name] : nullptr;
+        }
+    private:
+        std::map<std::string, Logger::ptr> m_loggers;
+        LoggerManager() {
+            Logger::ptr root = std::make_shared<Logger>();
+            root->addAppender(std::make_shared<StdoutLogAppender>());
+            m_loggers["root"] = root;
+        }
+    };
 
 }
 

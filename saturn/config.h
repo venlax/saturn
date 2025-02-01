@@ -1,7 +1,11 @@
 #ifndef __SATURN_CONFIG_H__
 #define __SATURN_CONFIG_H__
 
+
+#include "log.h"
+
 #include <boost/lexical_cast.hpp>
+#include <exception>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -42,6 +46,14 @@ namespace saturn {
         std::string toString() override {
             return boost::lexical_cast<std::string>(m_value);
         }
+        bool fromString(std::string_view str) override {
+            try {
+                return boost::lexical_cast<T>(str);
+            } catch (std::exception& e) {
+                // TODO
+            }
+        }
+
     };
 }
 
