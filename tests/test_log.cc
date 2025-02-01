@@ -8,7 +8,7 @@ int main() {
 
     auto appender = std::make_shared<StdoutLogAppender>(); 
     
-    auto formatter = std::make_shared<LogFormatter>("[%p]: %logger: %d{UNIX} %F [%thread] [%f]%line %msg %%  %ems");
+    auto formatter = std::make_shared<LogFormatter>("[%p]: %logger: %d{%Y%m%d%H%M%S} %F [%thread] [%f]%line %msg %%  %ems");
     
     appender->setFormatter(formatter);
     

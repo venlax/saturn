@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 /**
@@ -16,7 +17,7 @@
 
 namespace saturn {
 
-    std::string timestampToString(uint64_t timestamp); 
+    std::string timestampToString(uint64_t timestamp, std::string_view fmt = "%Y-%m-%dT%H:%M:%SZ"); 
 
 
     template <typename To, typename From>

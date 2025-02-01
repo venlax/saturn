@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <sstream>
+#include <string>
 
 
 namespace saturn {
@@ -137,11 +138,13 @@ plain_str:
         if (m_type == TimeType::UNIX) {
             return std::to_string(event->getTime());
         } else if (m_type == TimeType::UNIX_MILLIS) {
-            // TODO
+            std::chrono::seconds sec(event->getTime()); 
+            std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(sec);
+            return std::to_string(ms.count());
         } else if (m_type == TimeType::ISO8601) {
-            // TODO
+            return timestampToString(event->getTime());
         } else {
-            // TODO
+            return timestampToString(event->getTime(), this->m_pattern);
         }
         return "";
     }

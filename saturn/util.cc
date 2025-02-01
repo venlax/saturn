@@ -1,21 +1,22 @@
 #include "util.h"
 
+#include <chrono>
 #include <cstdlib>
 #include <string>
 #include <type_traits>
 
 namespace saturn {
 
-    std::string timestampToString(uint64_t timestamp) {
-        // 将时间戳转换为time_t类型
-        std::time_t time = static_cast<std::time_t>(timestamp);
+    std::string timestampToString(uint64_t timestamp, std::string_view fmt) {
+        // 将时间戳转换为 std::chrono::system_clock::time_point
+        std::chrono::system_clock::time_point tp = std::chrono::system_clock::from_time_t(timestamp);
 
-        // 转换为本地时间（也可以用gmtime转换为UTC时间）
-        std::tm *tm = std::localtime(&time);
+        // 转换为 std::tm 结构
+        std::time_t time_t_val = std::chrono::system_clock::to_time_t(tp);
+        std::tm tm_val = *std::gmtime(&time_t_val); // 转换为 UTC 时间
 
-        // 格式化输出
         std::ostringstream oss;
-        oss << std::put_time(tm, "%Y-%m-%d %H:%M:%S");
+        oss << std::put_time(&tm_val, fmt.data());
         return std::move(oss.str());
     }
 

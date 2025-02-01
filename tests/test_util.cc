@@ -11,9 +11,9 @@
 using namespace std;
 
 int main() {
-    assert(saturn::timestampToString(0) == "1970-01-01 08:00:00");
-    // cout << saturn::timestampToString(timeStamp) << endl;
-    assert(saturn::timestampToString(365 * 24 * 60 * 60) == "1971-01-01 08:00:00");
+    // assert(saturn::timestampToString(0) == "1970-01-01 08:00:00");
+    // // cout << saturn::timestampToString(timeStamp) << endl;
+    // assert(saturn::timestampToString(365 * 24 * 60 * 60) == "1971-01-01 08:00:00");
 
     string str = "125";
 

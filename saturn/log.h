@@ -75,7 +75,7 @@ namespace saturn {
     private:
         //std::unordered_map<char,  std::function<std::string(LogEvent::ptr)>> m_format_rules;
         class FormatPattern {
-            private:
+            protected:
                 std::string m_pattern;
             public:
                 using ptr = std::shared_ptr<FormatPattern>;
