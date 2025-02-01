@@ -12,17 +12,17 @@
 
 
 namespace saturn {
-    class ConfigValBase {
+    class ConfigVarBase {
     protected:
         std::string m_name;
         std::string m_description;
     
     public:
-        using ptr = std::shared_ptr<ConfigValBase>; 
-        ConfigValBase() = delete;
-        ConfigValBase(std::string_view name, std::string_view description = "") 
+        using ptr = std::shared_ptr<ConfigVarBase>; 
+        ConfigVarBase() = delete;
+        ConfigVarBase(std::string_view name, std::string_view description = "") 
         : m_name(name), m_description(description) {}
-        virtual ~ConfigValBase();
+        virtual ~ConfigVarBase();
 
         std::string_view getName() {return this->m_name;};
         std::string_view getDescription() {return this->m_description;};
@@ -32,15 +32,15 @@ namespace saturn {
     };
 
     template<class T>
-    class ConfigVal : public ConfigValBase {
+    class ConfigVar : public ConfigVarBase {
     private:
         T m_value;
 
     public: 
-        using ptr = std::shared_ptr<ConfigVal<T>>;
+        using ptr = std::shared_ptr<ConfigVar<T>>;
 
-        ConfigVal(std::string_view name, const T& default_value, std::string_view description) 
-        : ConfigValBase(name, description), m_value(default_value)
+        ConfigVar(std::string_view name, const T& default_value, std::string_view description) 
+        : ConfigVarBase(name, description), m_value(default_value)
         {}
 
         std::string toString() override {
