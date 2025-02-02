@@ -190,25 +190,25 @@ plain_str:
     /*********************************************************/
     
 
-    void Logger::log(LogLevel level, LogEvent event) {
+    void Logger::log(LogLevel level, LogEvent::ptr event) {
         for (auto &appender : this->m_appenders) {
-            appender->log(this->m_name, level, std::make_shared<LogEvent>(event));
+            appender->log(this->m_name, level, event);
         }
     }
 
-    void Logger::debug(LogEvent event) {
+    void Logger::debug(LogEvent::ptr event) {
         log(LogLevel::DEBUG, event);
     }
-    void Logger::info(LogEvent event) {
+    void Logger::info(LogEvent::ptr event) {
         log(LogLevel::INFO, event);
     }
-    void Logger::warn(LogEvent event) {
+    void Logger::warn(LogEvent::ptr event) {
         log(LogLevel::WARN, event);
     }
-    void Logger::error(LogEvent event) {
+    void Logger::error(LogEvent::ptr event) {
         log(LogLevel::ERROR, event);
     }
-    void Logger::fatal(LogEvent event) {
+    void Logger::fatal(LogEvent::ptr event) {
         log(LogLevel::FATAL, event);
     }
 

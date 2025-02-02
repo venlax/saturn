@@ -1,10 +1,11 @@
 #include "log.h"
+#include "util.h"
 #include <memory>
 
 int main() {
     using namespace saturn;
 
-    Logger logger("test");
+    Logger::ptr logger = std::make_shared<Logger>("test");
 
     auto appender = std::make_shared<StdoutLogAppender>(); 
     
@@ -12,18 +13,17 @@ int main() {
     
     appender->setFormatter(formatter);
     
-    logger.addAppender(appender);
+    logger->addAppender(appender);
 
     auto appender2 = std::make_shared<FileLogAppender>("log.txt");
 
     appender2->setFormatter(formatter);
 
-    logger.addAppender(appender2);
+    logger->addAppender(appender2);
     
-    logger.setLevel(saturn::LogLevel::INFO);
+    logger->setLevel(saturn::LogLevel::INFO);
     
-    LogEvent event("/usr", 5, 6 , 7 , 8 , 9, "okk");
-    
-    logger.log(LogLevel::INFO, event);
+    SATURN_LOG_INFO(logger) << "okk";
+
     return 0;
 }
