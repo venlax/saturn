@@ -1,15 +1,16 @@
 #ifndef __SATURN_CONFIG_H__
 #define __SATURN_CONFIG_H__
 
-
-#include "log.h"
-
 #include <boost/lexical_cast.hpp>
 #include <exception>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <typeinfo>
 
+
+#include "log.h"
+#include "util.h"
 
 namespace saturn {
     class ConfigVarBase {
@@ -44,15 +45,51 @@ namespace saturn {
         {}
 
         std::string toString() override {
-            return boost::lexical_cast<std::string>(m_value);
+            try {
+                return boost::lexical_cast<std::string>(m_value);
+            } catch (std::exception& e) {
+                SATURN_LOG_ERROR(LOGGER()) 
+                << "error[" << e.what() << "]: cast from "  << typeid(T).name() << " to std::string";
+            }
         }
         bool fromString(std::string_view str) override {
             try {
-                return boost::lexical_cast<T>(str);
+                m_value = boost::lexical_cast<T>(str);
+                return true;
             } catch (std::exception& e) {
-                // TODO
+                SATURN_LOG_ERROR(LOGGER()) 
+                << "error[" << e.what() << "]: cast from std::string to " << typeid(T).name();
             }
+            return false;
         }
+
+    };
+
+    class Config {
+        private:
+            template<typename T>
+            typename ConfigVar<T>::ptr lookUp(std::string_view name) const{
+                if (!m_vars.contains(name.data())) {
+                    return nullptr;
+                }
+                return m_vars[name.data()];
+            }
+
+            template<typename T>
+            typename ConfigVar<T>::ptr add(std::string_view name, const T& default_value, std::string_view description) {
+                typename ConfigVar<T>::ptr res = nullptr;
+                if ((res = lookUp<T>(name))) {
+                    SATURN_LOG_INFO(LOGGER()) << "config var \"" << name << "\" exists";
+                    return res;
+                }
+                res = std::make_shared<T>(name, default_value, description);
+                return res;
+            }
+            
+
+        public:
+            using ptr = std::shared_ptr<Config> ;
+            static std::map<std::string, ConfigVarBase::ptr> m_vars;
 
     };
 }

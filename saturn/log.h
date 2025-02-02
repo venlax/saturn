@@ -293,6 +293,8 @@ namespace saturn {
     #define SATURN_LOG_WARN(logger) SATURN_LOG_LEVEL(logger, LogLevel::WARN)
     #define SATURN_LOG_ERROR(logger) SATURN_LOG_LEVEL(logger, LogLevel::ERROR)
     #define SATURN_LOG_FATAL(logger) SATURN_LOG_LEVEL(logger, LogLevel::FATAL)
+
+    #define LOGGER(name) LoggerManager::getInstance()->getLogger(name)
     
 }
 
