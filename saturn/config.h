@@ -7,6 +7,8 @@
 #include <string>
 #include <string_view>
 #include <typeinfo>
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/yaml.h>
 
 
 #include "log.h"
@@ -67,6 +69,13 @@ namespace saturn {
 
     class Config {
         private:
+            ConfigVarBase::ptr lookUp(std::string_view name) const {
+                if (!m_vars.contains(name.data())) {
+                    return nullptr;
+                }
+                return m_vars[name.data()];
+            }
+
             template<typename T>
             typename ConfigVar<T>::ptr lookUp(std::string_view name) const{
                 if (!m_vars.contains(name.data())) {
@@ -85,6 +94,7 @@ namespace saturn {
                 res = std::make_shared<T>(name, default_value, description);
                 return res;
             }
+            void loadFromYaml(const YAML::Node& root);
             
 
         public:
