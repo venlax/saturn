@@ -17,7 +17,7 @@ namespace saturn {
 
         std::ostringstream oss;
         oss << std::put_time(&tm_val, fmt.data());
-        return std::move(oss.str());
+        return oss.str();
     }
 
     uint64_t get_current_time() {

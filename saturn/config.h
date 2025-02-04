@@ -2,6 +2,7 @@
 #define __SATURN_CONFIG_H__
 
 #include <exception>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -15,6 +16,8 @@
 #include "util.h"
 
 namespace saturn {
+    template <typename T>
+    using config_change_cb = std::function<void (T& old_value, T& new_value)> ;
 
     class ConfigVarBase {
     protected:
@@ -40,11 +43,11 @@ namespace saturn {
             ,class ToStr = cast<T, std::string>>
     class ConfigVar : public ConfigVarBase {
     private:
+        using cb = config_change_cb<T>;
         T m_value;
-
+        std::map<uint64_t, cb> cb_maps;
     public: 
         using ptr = std::shared_ptr<ConfigVar<T>>;
-
         ConfigVar(std::string_view name, const T& default_value, std::string_view description) 
         : ConfigVarBase(name, description), m_value(default_value)
         {}
@@ -66,6 +69,23 @@ namespace saturn {
                 << "error[" << e.what() << "]: cast from std::string to " << typeid(T).name();
             }
             return false;
+        }
+        size_t addListener(cb& cb_) {
+            uint64_t hash_v = std::hash<cb>();
+            cb_maps.emplace(hash_v, cb_);
+            return hash_v;
+        }
+
+        void delListener(uint64_t hash_v) {
+            cb_maps.erase(hash_v);
+        }
+
+        cb& getListener(uint64_t hash_v) {
+            return cb_maps.contains(hash_v) ? cb_maps[hash_v] : nullptr;
+        }
+
+        void clearListener() {
+            cb_maps.clear();
         }
 
     };

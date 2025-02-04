@@ -130,7 +130,7 @@ plain_str:
         }
         ss << std::endl;
 
-        return std::move(ss.str());
+        return ss.str();
     }
 
     std::string LogFormatter::TimeFormatPattern::str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
