@@ -1,12 +1,12 @@
 #ifndef __SATURN_CONFIG_H__
 #define __SATURN_CONFIG_H__
 
-#include <boost/lexical_cast.hpp>
 #include <exception>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <typeinfo>
+#include <type_traits>
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/yaml.h>
 
@@ -15,6 +15,7 @@
 #include "util.h"
 
 namespace saturn {
+
     class ConfigVarBase {
     protected:
         std::string m_name;
@@ -34,7 +35,9 @@ namespace saturn {
         virtual bool fromString(std::string_view str) = 0;
     };
 
-    template<class T>
+    template<class T
+            ,class FromStr = cast<std::string, T>
+            ,class ToStr = cast<T, std::string>>
     class ConfigVar : public ConfigVarBase {
     private:
         T m_value;
@@ -48,7 +51,7 @@ namespace saturn {
 
         std::string toString() override {
             try {
-                return boost::lexical_cast<std::string>(m_value);
+                return ToStr()(m_value);
             } catch (std::exception& e) {
                 SATURN_LOG_ERROR(LOGGER()) 
                 << "error[" << e.what() << "]: cast from "  << typeid(T).name() << " to std::string";
@@ -56,7 +59,7 @@ namespace saturn {
         }
         bool fromString(std::string_view str) override {
             try {
-                m_value = boost::lexical_cast<T>(str);
+                m_value = FromStr()(str);
                 return true;
             } catch (std::exception& e) {
                 SATURN_LOG_ERROR(LOGGER()) 

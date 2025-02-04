@@ -31,6 +31,7 @@ add_executable(test_util
     tests/test_util.cc
     saturn/util.cc
 ) 
+target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
 
 # 注册测试
 add_test(NAME TestLog COMMAND test_log)
