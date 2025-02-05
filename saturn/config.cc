@@ -31,7 +31,6 @@ namespace saturn {
                 continue;
             }
             ConfigVarBase::ptr var = lookUp(iter.first);
-
             if (var) {
                 if (iter.second.IsScalar()) {
                     var->fromString(iter.second.Scalar());

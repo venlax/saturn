@@ -52,6 +52,15 @@ namespace saturn {
         : ConfigVarBase(name, description), m_value(default_value)
         {}
 
+        const T getValue() const { return m_value;}
+
+        void setValue(T value) {
+            for (auto& cb : cb_maps) {
+                cb.second(m_value, value);
+            }
+            m_value = value;    
+        }
+
         std::string toString() override {
             try {
                 return ToStr()(m_value);
@@ -63,7 +72,7 @@ namespace saturn {
         }
         bool fromString(const std::string& str) override {
             try {
-                m_value = FromStr()(str);
+                setValue(FromStr()(str));
                 return true;
             } catch (std::exception& e) {
                 SATURN_LOG_ERROR(LOGGER()) 
@@ -123,6 +132,7 @@ namespace saturn {
                     return res;
                 }
                 res = std::make_shared<ConfigVar<T>>(name, default_value, description);
+                getVars().emplace(name, res);
                 return res;
             }
             static void loadFromYaml(const YAML::Node& root);

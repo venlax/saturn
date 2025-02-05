@@ -24,8 +24,8 @@ namespace saturn {
         // 获取当前时间点
         auto now = std::chrono::system_clock::now();
     
-        // 获取当前时间自纪元以来的毫秒数
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+        // 获取当前时间自纪元以来的秒数
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
     
         // 返回64位时间戳
         return duration.count();

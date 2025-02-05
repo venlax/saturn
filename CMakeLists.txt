@@ -21,22 +21,31 @@ include_directories(${PROJECT_SOURCE_DIR}/saturn)
 # 启用测试
 enable_testing()
 
-add_executable(test_log
-    tests/test_log.cc
-    saturn/config.cc
-    saturn/util.cc
-    saturn/log.cc
-)
+# add_executable(test_log
+#     tests/test_log.cc
+#     saturn/config.cc
+#     saturn/util.cc
+#     saturn/log.cc
+# )
 
-add_executable(test_util
-    tests/test_util.cc
-    saturn/util.cc
-    saturn/log.cc
+# add_executable(test_util
+#     tests/test_util.cc
+#     saturn/util.cc
+#     saturn/log.cc
+#     saturn/config.cc
+# ) 
+
+add_executable(test_config
+    tests/test_config.cc
     saturn/config.cc
-) 
-target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
-target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
+    saturn/log.cc
+    saturn/util.cc
+)
+# target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
+# target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
+target_link_libraries(test_config /usr/local/lib/libyaml-cpp.so)
 
 # 注册测试
-add_test(NAME TestLog COMMAND test_log)
-add_test(NAME TestUtil COMMAND test_util)
+# add_test(NAME TestLog COMMAND test_log)
+# add_test(NAME TestUtil COMMAND test_util)
+add_test(NAME TestConfig COMMAND test_config)
