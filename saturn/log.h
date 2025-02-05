@@ -13,6 +13,7 @@
 #include <string_view>
 #include <vector>
 
+
 namespace saturn {
 
     class LogEvent {
@@ -55,16 +56,18 @@ namespace saturn {
 
 
     enum class LogLevel {
+        UNKNOWN,
         DEBUG,
         INFO,
         WARN,
         ERROR,
         FATAL
+
     };
 
 
-    constexpr std::array<std::string_view, 5> level_str = {
-        "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
+    constexpr std::array<std::string_view, 6> level_str = {
+        "UNKNOWN", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
     };
 
     class LogFormatter {
@@ -75,7 +78,7 @@ namespace saturn {
 
         }
         std::string format(std::string_view logger_name, LogLevel level, LogEvent::ptr event);
-
+        bool isValid() const {return !error;};
     private:
         //std::unordered_map<char,  std::function<std::string(LogEvent::ptr)>> m_format_rules;
         class FormatPattern {
@@ -188,6 +191,7 @@ namespace saturn {
 
         std::string m_format; // "%m xxx %t xxx"
         std::vector<FormatPattern::ptr> m_patterns;
+        bool error = false;
         void parseFormat();
         
     };
@@ -195,6 +199,7 @@ namespace saturn {
     class LogAppender {
     public:
         using ptr = std::shared_ptr<LogAppender>;
+        LogAppender(LogLevel level, LogFormatter::ptr formatter) : m_level(level), m_formatter(formatter) {}
         virtual ~LogAppender(){};
 
         virtual void log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) = 0;
@@ -209,6 +214,7 @@ namespace saturn {
 
     class StdoutLogAppender : public LogAppender {
     public:
+        StdoutLogAppender(LogLevel level, LogFormatter::ptr formatter) : LogAppender(level, formatter) {};
         using ptr = std::shared_ptr<StdoutLogAppender>;
         void log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override;
     private:
@@ -217,7 +223,7 @@ namespace saturn {
     class FileLogAppender : public LogAppender {
     public:
         using ptr = std::shared_ptr<FileLogAppender>;
-        FileLogAppender(const std::filesystem::path& filepath);
+        FileLogAppender(LogLevel level, LogFormatter::ptr formatter, const std::filesystem::path& filepath);
         void log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override;
         bool reopen();
     private:
@@ -242,13 +248,17 @@ namespace saturn {
 
         void addAppender(LogAppender::ptr appender);
         void delAppender(LogAppender::ptr appender);
-
+        void clearAppenders() { m_appenders.clear();}
         LogLevel getLevel() const { return m_level; };
         void setLevel(LogLevel level) { this->m_level = level; };
+        LogFormatter::ptr getFormatter() const {return m_formatter;};
+        void setFormatter(LogFormatter::ptr formatter) {this->m_formatter = formatter;};
+
 
     private:
         std::string m_name;
         LogLevel m_level;
+        LogFormatter::ptr m_formatter;
         std::list<LogAppender::ptr> m_appenders;
     };
 
@@ -258,14 +268,20 @@ namespace saturn {
             static LoggerManager* instance = new LoggerManager();
             return instance; 
         }
-        Logger::ptr getLogger(std::string name = "root") {
-            return m_loggers.contains(name) ? m_loggers[name] : nullptr;
+        Logger::ptr getLogger(const std::string& name = "root") {
+            if (m_loggers.contains(name.data())) return m_loggers[name.data()];
+            m_loggers.emplace(name, std::make_shared<Logger>(name));
+            return m_loggers[name.data()];
+        }
+
+        void delLogger(const std::string& name) {
+            m_loggers.erase(name);
         }
     private:
         std::map<std::string, Logger::ptr> m_loggers;
         LoggerManager() {
             Logger::ptr root = std::make_shared<Logger>();
-            root->addAppender(std::make_shared<StdoutLogAppender>());
+            root->addAppender(std::make_shared<StdoutLogAppender>(LogLevel::INFO, std::make_shared<LogFormatter>("%p %m %F %L %t %f %e %c %d{ISO8601}")));
             m_loggers["root"] = root;
         }
     };
@@ -283,10 +299,43 @@ namespace saturn {
         LogLevel m_level;
     };
 
+
+    struct LogAppenderConfig {
+        int type;
+        LogLevel level;
+        std::string formatter;
+        std::string file;
+
+        bool operator==(const LogAppenderConfig& rhs) const {
+            return type == rhs.type
+                && level == rhs.level
+                && formatter == rhs.formatter
+                && file == rhs.file;
+        }
+    };
+
+    struct LogConfig {
+        std::string name;
+        LogLevel level;
+        std::string formatter;
+        std::vector<LogAppenderConfig> appenders;
+
+        bool operator==(const LogConfig& rhs) const {
+            return name == rhs.name
+                && level == rhs.level
+                && formatter == rhs.formatter
+                && appenders == rhs.appenders;
+        }
+
+        bool operator<(const LogConfig& rhs) const {
+            return name < rhs.name;
+        }
+    };
+
     #define SATURN_LOG_LEVEL(logger, level) \
     if(logger->getLevel() <= level) \
         saturn::LogEventWrapper(level, logger, std::make_shared<LogEvent>(__FILE__, \
-        __LINE__, 0, get_thread_id(), get_fiber_id(), get_current_time())).getSS()
+        __LINE__, 0, getThreadId(), getFiberId(), getCurrentTime())).getSS()
 
     #define SATURN_LOG_DEBUG(logger) SATURN_LOG_LEVEL(logger, LogLevel::DEBUG)
     #define SATURN_LOG_INFO(logger) SATURN_LOG_LEVEL(logger, LogLevel::INFO)

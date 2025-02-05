@@ -29,13 +29,13 @@ namespace saturn {
         ConfigVarBase() = delete;
         ConfigVarBase(std::string_view name, std::string_view description = "") 
         : m_name(name), m_description(description) {}
-        virtual ~ConfigVarBase();
+        virtual ~ConfigVarBase() = default;
 
         std::string_view getName() {return this->m_name;};
         std::string_view getDescription() {return this->m_description;};
 
         virtual std::string toString() = 0;
-        virtual bool fromString(std::string_view str) = 0;
+        virtual bool fromString(const std::string& str) = 0;
     };
 
     template<class T
@@ -59,8 +59,9 @@ namespace saturn {
                 SATURN_LOG_ERROR(LOGGER()) 
                 << "error[" << e.what() << "]: cast from "  << typeid(T).name() << " to std::string";
             }
+            return "";
         }
-        bool fromString(std::string_view str) override {
+        bool fromString(const std::string& str) override {
             try {
                 m_value = FromStr()(str);
                 return true;
@@ -70,10 +71,10 @@ namespace saturn {
             }
             return false;
         }
-        size_t addListener(cb& cb_) {
-            uint64_t hash_v = std::hash<cb>();
-            cb_maps.emplace(hash_v, cb_);
-            return hash_v;
+        uint64_t addListener(const cb& cb_) {
+            static uint64_t s_fun_id = 0;
+            cb_maps.emplace(s_fun_id, cb_);
+            return s_fun_id++;;
         }
 
         void delListener(uint64_t hash_v) {
@@ -88,41 +89,53 @@ namespace saturn {
             cb_maps.clear();
         }
 
+
+
     };
 
     class Config {
-        private:
-            ConfigVarBase::ptr lookUp(std::string_view name) const {
-                if (!m_vars.contains(name.data())) {
+        public:
+            static ConfigVarBase::ptr lookUp(std::string_view name)  {
+                if (!getVars().contains(name.data())) {
                     return nullptr;
                 }
-                return m_vars[name.data()];
+                return getVars()[name.data()];
             }
 
             template<typename T>
-            typename ConfigVar<T>::ptr lookUp(std::string_view name) const{
-                if (!m_vars.contains(name.data())) {
+            static typename ConfigVar<T>::ptr lookUp(std::string_view name) {
+                if (!getVars().contains(name.data())) {
                     return nullptr;
                 }
-                return m_vars[name.data()];
+                typename ConfigVar<T>::ptr res = nullptr;
+                if ((res = std::dynamic_pointer_cast<ConfigVar<T>>(getVars()[name.data()]))) {
+                    return res;
+                } else {
+                    return nullptr;
+                }
             }
 
             template<typename T>
-            typename ConfigVar<T>::ptr add(std::string_view name, const T& default_value, std::string_view description) {
+            static typename ConfigVar<T>::ptr add(std::string_view name, const T& default_value, std::string_view description) {
                 typename ConfigVar<T>::ptr res = nullptr;
                 if ((res = lookUp<T>(name))) {
                     SATURN_LOG_INFO(LOGGER()) << "config var \"" << name << "\" exists";
                     return res;
                 }
-                res = std::make_shared<T>(name, default_value, description);
+                res = std::make_shared<ConfigVar<T>>(name, default_value, description);
                 return res;
             }
-            void loadFromYaml(const YAML::Node& root);
+            static void loadFromYaml(const YAML::Node& root);
             
 
-        public:
+        private:
             using ptr = std::shared_ptr<Config> ;
-            static std::map<std::string, ConfigVarBase::ptr> m_vars;
+            using config_map = std::map<std::string, ConfigVarBase::ptr>;
+
+            static config_map& getVars() {
+                static std::map<std::string, ConfigVarBase::ptr> m_vars;
+                return m_vars;
+            }
 
     };
 }

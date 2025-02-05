@@ -1,10 +1,13 @@
 #include "log.h"
-#include "util.h"
+
 
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
+#include "config.h"
+#include "util.h"
 
 namespace saturn {
 
@@ -23,6 +26,11 @@ namespace saturn {
 
 
     void LogFormatter::parseFormat() {
+        if (m_format.empty()) {
+            error = true;
+            return;
+        } 
+        // "%p %m %F %L %t %f %e %c %d{ISO8601}"
         std::string_view views {m_format};
         for (size_t i = 0; i < views.length(); ++i) {
             if (views[i] == '%') {
@@ -154,24 +162,41 @@ plain_str:
       * @class LogAppender impl
      */
     /*********************************************************/
-    
+    // log 优先使用appender的formatter
 
     void StdoutLogAppender::log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
         if (level >= m_level) {
-            std::cout << m_formatter->format(logger_name, level, event);
+            if (m_formatter) std::cout << m_formatter->format(logger_name, level, event);
+            else {
+                Logger::ptr logger = LOGGER(logger_name.data());
+                if (logger->getFormatter()) {
+                    std::cout << logger->getFormatter()->format(logger_name, level, event);
+                } else {
+                    std::cout << "both logger's and appender's formatter invalid." << std::endl;
+                    throw std::logic_error("formatter invalid");
+                }
+            }
         }
     }
 
-    FileLogAppender::FileLogAppender(const std::filesystem::path &filepath) : m_filepath(filepath) {
+    FileLogAppender::FileLogAppender(LogLevel level, LogFormatter::ptr formatter, const std::filesystem::path &filepath) :LogAppender(level, formatter),  m_filepath(filepath) {
         if (m_filestream) {
             m_filestream.open(m_filepath, std::ios::app);
         }
     }
 
     void FileLogAppender::log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
-
         if (level >= m_level) {
-            m_filestream << getFormatter()->format(logger_name, level, event);
+            if (m_formatter) m_filestream << m_formatter->format(logger_name, level, event);
+            else {
+                Logger::ptr logger = LOGGER(logger_name.data());
+                if (logger->getFormatter()) {
+                    m_filestream << logger->getFormatter()->format(logger_name, level, event);
+                }  else {
+                    std::cout << "both logger's and appender's formatter invalid." << std::endl;
+                    throw std::logic_error("formatter invalid");
+                }
+            }
         }
     }
 
@@ -191,8 +216,14 @@ plain_str:
     
 
     void Logger::log(LogLevel level, LogEvent::ptr event) {
-        for (auto &appender : this->m_appenders) {
-            appender->log(this->m_name, level, event);
+        if (level >= m_level) {
+            if (!m_appenders.empty()) {
+                for (auto &appender : this->m_appenders) {
+                    appender->log(this->m_name, level, event);
+                }
+            } else {
+                LoggerManager::getInstance()->getLogger()->log(level, event);
+            }
         }
     }
 
@@ -225,4 +256,45 @@ plain_str:
             }
         }
     }
+
+    ConfigVar<std::set<LogConfig>>::ptr glb_log_config = Config::add("log", std::set<LogConfig>(), "global log config");
+
+    class LogIniter {
+        public: 
+            LogIniter() {
+                glb_log_config->addListener([](const std::set<LogConfig>& old_value, const std::set<LogConfig>& new_value) {
+                    for (auto& val : new_value) {
+                        Logger::ptr logger;
+                        logger = LOGGER(val.name);
+                        logger->setLevel(val.level);
+                        LogFormatter::ptr formatter = std::make_shared<LogFormatter>(val.formatter);
+                        if (!formatter->isValid()) formatter = nullptr;   
+                        logger->setFormatter(formatter);
+                        logger->clearAppenders();
+                        for (auto& ap : val.appenders) {
+                            LogFormatter::ptr formatter = std::make_shared<LogFormatter>(ap.formatter);
+                            if (!formatter->isValid()) formatter = nullptr;        
+                            if (ap.type == 1) {
+                                StdoutLogAppender::ptr stdout_ap = std::make_shared<StdoutLogAppender>(ap.level, formatter);
+                                logger->addAppender(stdout_ap);
+                            } else if (ap.type == 2) {
+                                FileLogAppender::ptr file_ap = std::make_shared<FileLogAppender>(ap.level, formatter, ap.file);
+                                logger->addAppender(file_ap);
+                            }
+                            
+                        }
+                    }
+                    for (auto& val : old_value) {
+                        if (!new_value.contains(val)) {
+                            Logger::ptr logger = LOGGER(val.name);
+                            logger->clearAppenders();
+                            LoggerManager::getInstance()->delLogger(val.name); 
+                        }
+                    }
+                    return;
+                });
+            }
+    };
+
+    static LogIniter log_initer;
 }

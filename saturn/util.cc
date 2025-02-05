@@ -20,7 +20,7 @@ namespace saturn {
         return oss.str();
     }
 
-    uint64_t get_current_time() {
+    uint64_t getCurrentTime() {
         // 获取当前时间点
         auto now = std::chrono::system_clock::now();
     
@@ -32,10 +32,10 @@ namespace saturn {
     }
 
  
-    pid_t get_thread_id() {
+    pid_t getThreadId() {
         return syscall(SYS_gettid);
     }
-    uint32_t get_fiber_id() {
+    uint32_t getFiberId() {
         // TODO
         return 0;
     }

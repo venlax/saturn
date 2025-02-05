@@ -23,6 +23,7 @@ enable_testing()
 
 add_executable(test_log
     tests/test_log.cc
+    saturn/config.cc
     saturn/util.cc
     saturn/log.cc
 )
@@ -30,7 +31,10 @@ add_executable(test_log
 add_executable(test_util
     tests/test_util.cc
     saturn/util.cc
+    saturn/log.cc
+    saturn/config.cc
 ) 
+target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
 target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
 
 # 注册测试
