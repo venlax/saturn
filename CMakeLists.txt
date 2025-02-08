@@ -35,15 +35,25 @@ enable_testing()
 #     saturn/config.cc
 # ) 
 
-add_executable(test_config
-    tests/test_config.cc
+# add_executable(test_config
+#     tests/test_config.cc
+#     saturn/config.cc
+#     saturn/log.cc
+#     saturn/util.cc
+# )
+
+add_executable(test_thread
+    tests/test_thread.cc
     saturn/config.cc
     saturn/log.cc
     saturn/util.cc
+    saturn/thread.cc
+    saturn/sem.cc
 )
 # target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
 # target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
-target_link_libraries(test_config /usr/local/lib/libyaml-cpp.so)
+# target_link_libraries(test_config /usr/local/lib/libyaml-cpp.so)
+target_link_libraries(test_thread /usr/local/lib/libyaml-cpp.so)
 
 # 注册测试
 # add_test(NAME TestLog COMMAND test_log)

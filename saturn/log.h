@@ -8,14 +8,15 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include "macro.h"
 
 namespace saturn {
-
     class LogEvent {
     public:
         using ptr = std::shared_ptr<LogEvent>;
@@ -210,6 +211,7 @@ namespace saturn {
     protected:
         LogLevel m_level;
         LogFormatter::ptr m_formatter;
+        std::mutex m_mutex;
     };
 
     class StdoutLogAppender : public LogAppender {
@@ -248,11 +250,17 @@ namespace saturn {
 
         void addAppender(LogAppender::ptr appender);
         void delAppender(LogAppender::ptr appender);
-        void clearAppenders() { m_appenders.clear();}
+        void clearAppenders() { 
+            LOCK(lock_guard, m_mutex);
+            m_appenders.clear();
+        }
         LogLevel getLevel() const { return m_level; };
         void setLevel(LogLevel level) { this->m_level = level; };
         LogFormatter::ptr getFormatter() const {return m_formatter;};
-        void setFormatter(LogFormatter::ptr formatter) {this->m_formatter = formatter;};
+        void setFormatter(LogFormatter::ptr formatter) {
+            LOCK(lock_guard, m_mutex);
+            this->m_formatter = formatter;
+        };
 
 
     private:
@@ -260,6 +268,7 @@ namespace saturn {
         LogLevel m_level;
         LogFormatter::ptr m_formatter;
         std::list<LogAppender::ptr> m_appenders;
+        std::mutex m_mutex;
     };
 
     class LoggerManager {
@@ -269,16 +278,19 @@ namespace saturn {
             return instance; 
         }
         Logger::ptr getLogger(const std::string& name = "root") {
+            LOCK(lock_guard, m_mutex);
             if (m_loggers.contains(name.data())) return m_loggers[name.data()];
             m_loggers.emplace(name, std::make_shared<Logger>(name));
             return m_loggers[name.data()];
         }
 
         void delLogger(const std::string& name) {
+            LOCK(lock_guard, m_mutex);
             m_loggers.erase(name);
         }
     private:
         std::map<std::string, Logger::ptr> m_loggers;
+        std::mutex m_mutex;
         LoggerManager() {
             Logger::ptr root = std::make_shared<Logger>();
             root->addAppender(std::make_shared<StdoutLogAppender>(LogLevel::INFO, std::make_shared<LogFormatter>("%p %m %F %L %t %f %e %c %d{ISO8601}")));
@@ -332,19 +344,6 @@ namespace saturn {
         }
     };
 
-    #define SATURN_LOG_LEVEL(logger, level) \
-    if(logger->getLevel() <= level) \
-        saturn::LogEventWrapper(level, logger, std::make_shared<LogEvent>(__FILE__, \
-        __LINE__, 0, getThreadId(), getFiberId(), getCurrentTime())).getSS()
-
-    #define SATURN_LOG_DEBUG(logger) SATURN_LOG_LEVEL(logger, LogLevel::DEBUG)
-    #define SATURN_LOG_INFO(logger) SATURN_LOG_LEVEL(logger, LogLevel::INFO)
-    #define SATURN_LOG_WARN(logger) SATURN_LOG_LEVEL(logger, LogLevel::WARN)
-    #define SATURN_LOG_ERROR(logger) SATURN_LOG_LEVEL(logger, LogLevel::ERROR)
-    #define SATURN_LOG_FATAL(logger) SATURN_LOG_LEVEL(logger, LogLevel::FATAL)
-
-    #define LOGGER(name) LoggerManager::getInstance()->getLogger(name)
-    
 }
 
 #endif // !__SATURN_LOG_H__

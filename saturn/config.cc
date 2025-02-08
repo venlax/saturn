@@ -7,6 +7,8 @@
 
 namespace saturn {
 
+    std::mutex Config::m_mutex;
+
     static void iterateNodes(const std::string& prefix,
                             const YAML::Node& root
                             , std::list<std::pair<std::string, const YAML::Node>>& list) {

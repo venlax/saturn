@@ -200,7 +200,6 @@ namespace saturn {
                 
         }
     };
-
 }
 
 #endif // !__SATURN_UTIL_H__

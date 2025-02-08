@@ -4,6 +4,7 @@
 #include <exception>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <typeinfo>
@@ -13,6 +14,7 @@
 
 
 #include "log.h"
+#include "macro.h"
 #include "util.h"
 
 namespace saturn {
@@ -46,6 +48,7 @@ namespace saturn {
         using cb = config_change_cb<T>;
         T m_value;
         std::map<uint64_t, cb> cb_maps;
+        std::mutex m_mutex;
     public: 
         using ptr = std::shared_ptr<ConfigVar<T>>;
         ConfigVar(std::string_view name, const T& default_value, std::string_view description) 
@@ -55,6 +58,7 @@ namespace saturn {
         const T getValue() const { return m_value;}
 
         void setValue(T value) {
+            LOCK(lock_guard, m_mutex);
             for (auto& cb : cb_maps) {
                 cb.second(m_value, value);
             }
@@ -82,11 +86,13 @@ namespace saturn {
         }
         uint64_t addListener(const cb& cb_) {
             static uint64_t s_fun_id = 0;
+            LOCK(lock_guard, m_mutex);
             cb_maps.emplace(s_fun_id, cb_);
             return s_fun_id++;;
         }
 
         void delListener(uint64_t hash_v) {
+            LOCK(lock_guard, m_mutex);
             cb_maps.erase(hash_v);
         }
 
@@ -95,6 +101,7 @@ namespace saturn {
         }
 
         void clearListener() {
+            LOCK(lock_guard, m_mutex);
             cb_maps.clear();
         }
 
@@ -105,6 +112,7 @@ namespace saturn {
     class Config {
         public:
             static ConfigVarBase::ptr lookUp(std::string_view name)  {
+                LOCK(lock_guard, m_mutex);
                 if (!getVars().contains(name.data())) {
                     return nullptr;
                 }
@@ -113,6 +121,7 @@ namespace saturn {
 
             template<typename T>
             static typename ConfigVar<T>::ptr lookUp(std::string_view name) {
+                LOCK(lock_guard, m_mutex);
                 if (!getVars().contains(name.data())) {
                     return nullptr;
                 }
@@ -131,6 +140,7 @@ namespace saturn {
                     SATURN_LOG_INFO(LOGGER()) << "config var \"" << name << "\" exists";
                     return res;
                 }
+                LOCK(lock_guard, m_mutex);
                 res = std::make_shared<ConfigVar<T>>(name, default_value, description);
                 getVars().emplace(name, res);
                 return res;
@@ -141,7 +151,7 @@ namespace saturn {
         private:
             using ptr = std::shared_ptr<Config> ;
             using config_map = std::map<std::string, ConfigVarBase::ptr>;
-
+            static std::mutex m_mutex; 
             static config_map& getVars() {
                 static std::map<std::string, ConfigVarBase::ptr> m_vars;
                 return m_vars;

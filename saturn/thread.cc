@@ -32,6 +32,7 @@ namespace saturn {
                 << " name=" << name;
             throw std::logic_error("pthread_create error");
         }
+        m_sem.wait();
     }
 
     void* Thread::run(void* args) {
@@ -42,6 +43,7 @@ namespace saturn {
         pthread_setname_np(pthread_self(), thread->m_name.substr(0, 15).c_str());
         std::function<void()> cb;
         cb.swap(thread->m_cb);
+        thread->m_sem.notify();
         cb();
         return 0;
     }

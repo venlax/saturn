@@ -7,6 +7,8 @@
 
 #include <pthread.h>
 
+#include "sem.h"
+
 namespace saturn {
     class Thread {
     private:
@@ -14,6 +16,7 @@ namespace saturn {
         std::string m_name;
         pthread_t m_thread;
         std::function<void()> m_cb;
+        Semaphore m_sem;
     public:
         using ptr = std::shared_ptr<Thread>;
         Thread(std::function<void()> cb, std::string_view name);

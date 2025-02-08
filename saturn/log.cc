@@ -2,6 +2,7 @@
 
 
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -165,6 +166,7 @@ plain_str:
     // log 优先使用appender的formatter
 
     void StdoutLogAppender::log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
+        LOCK(lock_guard, m_mutex);
         if (level >= m_level) {
             if (m_formatter) std::cout << m_formatter->format(logger_name, level, event);
             else {
@@ -186,6 +188,7 @@ plain_str:
     }
 
     void FileLogAppender::log(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
+        LOCK(lock_guard, m_mutex);
         if (level >= m_level) {
             if (m_formatter) m_filestream << m_formatter->format(logger_name, level, event);
             else {
@@ -201,6 +204,7 @@ plain_str:
     }
 
     bool FileLogAppender::reopen() {
+        LOCK(lock_guard, m_mutex);
         if (m_filestream) {
             m_filestream.close();
         }
@@ -216,6 +220,7 @@ plain_str:
     
 
     void Logger::log(LogLevel level, LogEvent::ptr event) {
+        LOCK(lock_guard, m_mutex);
         if (level >= m_level) {
             if (!m_appenders.empty()) {
                 for (auto &appender : this->m_appenders) {
@@ -244,9 +249,11 @@ plain_str:
     }
 
     void Logger::addAppender(LogAppender::ptr appender) {
+        LOCK(lock_guard, m_mutex);
         m_appenders.push_back(appender);
     }
     void Logger::delAppender(LogAppender::ptr appender) {
+        LOCK(lock_guard, m_mutex);
         for (auto iter = m_appenders.begin(); 
                 iter != m_appenders.end(); 
                 ++iter) {
