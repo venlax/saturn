@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 20)  # 使用 C++20 , partial 😀
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(yaml-cpp REQUIRED)
 
+add_compile_options(-rdynamic)
 
 # 启用调试信息
 set(CMAKE_BUILD_TYPE Debug)
@@ -28,12 +29,14 @@ enable_testing()
 #     saturn/log.cc
 # )
 
-# add_executable(test_util
-#     tests/test_util.cc
-#     saturn/util.cc
-#     saturn/log.cc
-#     saturn/config.cc
-# ) 
+add_executable(test_util
+    tests/test_util.cc
+    saturn/util.cc
+    saturn/log.cc
+    saturn/config.cc
+    saturn/thread.cc
+    saturn/sem.cc
+) 
 
 # add_executable(test_config
 #     tests/test_config.cc
@@ -42,18 +45,18 @@ enable_testing()
 #     saturn/util.cc
 # )
 
-add_executable(test_thread
-    tests/test_thread.cc
-    saturn/config.cc
-    saturn/log.cc
-    saturn/util.cc
-    saturn/thread.cc
-    saturn/sem.cc
-)
+# add_executable(test_thread
+#     tests/test_thread.cc
+#     saturn/config.cc
+#     saturn/log.cc
+#     saturn/util.cc
+#     saturn/thread.cc
+#     saturn/sem.cc
+# )
 # target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
-# target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
+target_link_libraries(test_util /usr/local/lib/libyaml-cpp.so)
 # target_link_libraries(test_config /usr/local/lib/libyaml-cpp.so)
-target_link_libraries(test_thread /usr/local/lib/libyaml-cpp.so)
+# target_link_libraries(test_thread /usr/local/lib/libyaml-cpp.so)
 
 # 注册测试
 # add_test(NAME TestLog COMMAND test_log)

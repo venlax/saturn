@@ -21,6 +21,7 @@
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/yaml.h>
 
+
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -76,6 +77,8 @@ namespace saturn {
     uint64_t getCurrentTime();
     pid_t getThreadId();
     uint32_t getFiberId();
+    void backtrace(std::vector<std::string>& vec, int size, int skip);
+    std::string backtraceStr(int size = 64, int skip = 0, std::string_view prefix = "");
 
     template<class From, class To>
     class cast {

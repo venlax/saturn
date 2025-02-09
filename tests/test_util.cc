@@ -1,3 +1,4 @@
+#include "macro.h"
 #include "util.h"
 
 #include <cassert>
@@ -17,28 +18,38 @@ using namespace std;
 
 
 
-int main() {
-    int i = 5;
-    // int* ptr = &i;
-    test_cast(i);
+void func() {
+    SATURN_ASSERT(0 == 1);
+}
+void func1() {
+    func();
     
-    float f = 0.5f;
-    test_cast(f);
-
-    bool b = true;
-    test_cast(b);
-
-    std::vector<int> vec = {1,2,3};
-    test_cast(vec);
-
-    std::list<float> list = {1.0,2.0,3.5};
-    test_cast(list);
-
-    std::set<double> set = {7.5, 8.4, 9.3};
-    test_cast(set);
-
-    std::map<int, double> map = {{5,5.5}, {6,6.5}, {7,7.5}};
-    test_cast(map);
+}
 
 
+
+int main() {
+    // int i = 5;
+    // // int* ptr = &i;
+    // test_cast(i);
+    
+    // float f = 0.5f;
+    // test_cast(f);
+
+    // bool b = true;
+    // test_cast(b);
+
+    // std::vector<int> vec = {1,2,3};
+    // test_cast(vec);
+
+    // std::list<float> list = {1.0,2.0,3.5};
+    // test_cast(list);
+
+    // std::set<double> set = {7.5, 8.4, 9.3};
+    // test_cast(set);
+
+    // std::map<int, double> map = {{5,5.5}, {6,6.5}, {7,7.5}};
+    // test_cast(map);
+
+    func1();
 }
