@@ -1,6 +1,4 @@
 #include "util.h"
-#include "log.h"
-#include "macro.h"
 
 #include <chrono>
 #include <cstdlib>
@@ -8,6 +6,10 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+
+#include "fiber.h"
+#include "log.h"
+#include "macro.h"
 
 namespace saturn {
     static saturn::Logger::ptr g_logger = LOGGER();
@@ -42,8 +44,7 @@ namespace saturn {
         return syscall(SYS_gettid);
     }
     uint32_t getFiberId() {
-        // TODO
-        return 0;
+        return Fiber::getFiberId();
     }
 
     void backtrace(std::vector<std::string>& vec, int size, int skip) {

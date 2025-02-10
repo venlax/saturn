@@ -293,7 +293,7 @@ namespace saturn {
         std::mutex m_mutex;
         LoggerManager() {
             Logger::ptr root = std::make_shared<Logger>();
-            root->addAppender(std::make_shared<StdoutLogAppender>(LogLevel::INFO, std::make_shared<LogFormatter>("%p %m %F %L %t %f %e %c %d{ISO8601}")));
+            root->addAppender(std::make_shared<StdoutLogAppender>(LogLevel::INFO, std::make_shared<LogFormatter>("[%p] %F %L thread[%t] fiber[%f] %e [%c] %d{ISO8601} %m")));
             m_loggers["root"] = root;
         }
     };
@@ -313,7 +313,7 @@ namespace saturn {
 
 
     struct LogAppenderConfig {
-        int type;
+        int type; // 1 stdout 2 file
         LogLevel level;
         std::string formatter;
         std::string file;

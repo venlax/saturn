@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <yaml-cpp/node/parse.h>
 
 #include "config.h"
 #include "util.h"
@@ -300,6 +301,8 @@ plain_str:
                     }
                     return;
                 });
+                YAML::Node node = YAML::LoadFile("/home/venicebitch/saturn/tests/config/log.yaml");
+                Config::loadFromYaml(node);
             }
     };
 
