@@ -18,7 +18,7 @@ namespace saturn {
     
     Fiber::Fiber() {
         m_state = State::EXEC;
-        setThis(this);
+        SetThis(this);
     
         if(getcontext(&m_ctx)) {
             SATURN_ASSERT(false);
@@ -42,7 +42,7 @@ namespace saturn {
         m_ctx.uc_stack.ss_sp = m_stack;
         m_ctx.uc_stack.ss_size = m_stacksize;
     
-        makecontext(&m_ctx, &Fiber::mainFunc, 0);
+        makecontext(&m_ctx, &Fiber::MainFunc, 0);
 
     
         SATURN_LOG_DEBUG(g_logger) << "Fiber::Fiber id=" << m_id;
@@ -62,7 +62,7 @@ namespace saturn {
     
             Fiber* cur = t_fiber;
             if(cur == this) {
-                setThis(nullptr);
+                SetThis(nullptr);
             }
         }
         SATURN_LOG_DEBUG(g_logger) << "Fiber::~Fiber id=" << m_id
@@ -84,12 +84,12 @@ namespace saturn {
         m_ctx.uc_stack.ss_sp = m_stack;
         m_ctx.uc_stack.ss_size = m_stacksize;
     
-        makecontext(&m_ctx, &Fiber::mainFunc, 0);
+        makecontext(&m_ctx, &Fiber::MainFunc, 0);
         m_state = INIT;
     }
 
     void Fiber::swapIn() {
-        setThis(this);
+        SetThis(this);
         SATURN_ASSERT(m_state != State::EXEC);
         this->m_state = State::EXEC;
         if (swapcontext(&t_threadFiber->m_ctx , &this->m_ctx)) {
@@ -97,18 +97,18 @@ namespace saturn {
         }
     }
     void Fiber::swapOut() {
-        setThis(t_threadFiber.get());
+        SetThis(t_threadFiber.get());
 
         if(swapcontext(&this->m_ctx, &t_threadFiber->m_ctx)) {
             SATURN_ASSERT(false);
         }
     }
 
-    void Fiber::setThis(Fiber* f) {
+    void Fiber::SetThis(Fiber* f) {
         t_fiber = f;
     }
 
-    Fiber::ptr Fiber::getThis() {
+    Fiber::ptr Fiber::GetThis() {
         if(t_fiber) {
             return t_fiber->shared_from_this();
         }
@@ -118,18 +118,18 @@ namespace saturn {
         return t_fiber->shared_from_this();
     }
 
-    void Fiber::yieldToReady() {
-        Fiber::ptr cur = getThis();
+    void Fiber::YieldToReady() {
+        Fiber::ptr cur = GetThis();
         cur->m_state = State::READY;
         cur->swapOut();
     }
-    void Fiber::yieldToHold() {
-        Fiber::ptr cur = getThis();
+    void Fiber::YieldToHold() {
+        Fiber::ptr cur = GetThis();
         cur->m_state = State::HOLD;
         cur->swapOut();
     }
-    void Fiber::mainFunc() {
-        Fiber::ptr cur = getThis();
+    void Fiber::MainFunc() {
+        Fiber::ptr cur = GetThis();
         SATURN_ASSERT(cur);
         try {
             cur->m_cb();
@@ -156,7 +156,7 @@ namespace saturn {
         SATURN_ASSERT(false);
     }
 
-    uint32_t Fiber::getFiberId() {
+    uint32_t Fiber::GetFiberId() {
         if(t_fiber) {
             return t_fiber->getId();
         }

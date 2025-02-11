@@ -44,12 +44,12 @@ namespace saturn
         uint32_t getId() const {return m_id;}
         State getState() const {return m_state;}
 
-        static void setThis(Fiber* f);
-        static Fiber::ptr getThis();
-        static void yieldToReady();
-        static void yieldToHold();
-        static void mainFunc();
-        static uint32_t getFiberId();
+        static void SetThis(Fiber* f);
+        static Fiber::ptr GetThis();
+        static void YieldToReady();
+        static void YieldToHold();
+        static void MainFunc();
+        static uint32_t GetFiberId();
     };
 }
 
