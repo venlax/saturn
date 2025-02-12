@@ -44,7 +44,7 @@ namespace saturn {
         return syscall(SYS_gettid);
     }
     uint32_t getFiberId() {
-        return Fiber::getFiberId();
+        return Fiber::GetFiberId();
     }
 
     void backtrace(std::vector<std::string>& vec, int size, int skip) {

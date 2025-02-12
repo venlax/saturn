@@ -4,6 +4,7 @@
 #include <atomic>
 #include <list>
 #include <mutex>
+#include <sched.h>
 #include <vector>
 
 #include "macro.h"
@@ -33,7 +34,7 @@ namespace saturn {
         void stop();
 
         template<class FiberOrCb>
-        void schedule(FiberOrCb fc, int thread = -1) {
+        void schedule(FiberOrCb fc, pid_t thread = -1) {
             bool need_tickle = false;
             {
                 LOCK(lock_guard, m_mutex);
@@ -83,7 +84,7 @@ namespace saturn {
     private:
 
         template<class FiberOrCb>
-        bool scheduleNoLock(FiberOrCb fc, int thread) {
+        bool scheduleNoLock(FiberOrCb fc, pid_t thread) {
             bool need_tickle = m_fibers.empty();
             FiberAndThread ft(fc, thread);
             if(ft.fiber || ft.cb) {
@@ -99,21 +100,21 @@ namespace saturn {
         public:
             Fiber::ptr fiber;
             std::function<void()> cb;
-            int thread;
+            pid_t thread;
 
-            FiberAndThread(Fiber::ptr f, int thr)
+            FiberAndThread(Fiber::ptr f, pid_t thr)
                 :fiber(f), thread(thr) {
             }
-            FiberAndThread(Fiber::ptr* f, int thr)
+            FiberAndThread(Fiber::ptr* f, pid_t thr)
                 :thread(thr) {
                 fiber.swap(*f);
             }
 
-            FiberAndThread(std::function<void()> f, int thr)
+            FiberAndThread(std::function<void()> f, pid_t thr)
                 :cb(f), thread(thr) {
             }
 
-            FiberAndThread(std::function<void()>* f, int thr)
+            FiberAndThread(std::function<void()>* f, pid_t thr)
                 :thread(thr) {
                 cb.swap(*f);
             }
@@ -134,13 +135,13 @@ namespace saturn {
         Fiber::ptr m_rootFiber;
         std::string m_name;
     protected:
-        std::vector<int> m_threadIds;
+        std::vector<pid_t> m_threadIds;
         size_t m_threadCount = 0;
         std::atomic<size_t> m_activeThreadCount = {0};
         std::atomic<size_t> m_idleThreadCount = {0};
         bool m_stopping = true;
         bool m_autoStop = false;
-        int m_rootThread = 0;
+        pid_t m_rootThread = 0;
     };
 }
 

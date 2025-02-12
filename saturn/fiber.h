@@ -36,7 +36,7 @@ namespace saturn
         std::function<void()> m_cb;    
     public:
         Fiber();
-        Fiber(std::function<void()> cb, size_t stacksize);
+        Fiber(std::function<void()> cb, size_t stacksize, bool use_caller = false);
         ~Fiber();
         void swapIn();
         void swapOut();

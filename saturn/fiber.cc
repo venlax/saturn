@@ -29,7 +29,7 @@ namespace saturn {
         SATURN_LOG_DEBUG(g_logger) << "Fiber::Fiber main";
     }
 
-    Fiber::Fiber(std::function<void()> cb, size_t stacksize) 
+    Fiber::Fiber(std::function<void()> cb, size_t stacksize, bool use_caller) 
     : m_cb(cb), m_id(s_fiber_id++) {
         ++s_fiber_count;
         m_stacksize = stacksize ? stacksize : g_fiber_stack_size->getValue();
@@ -42,8 +42,10 @@ namespace saturn {
         m_ctx.uc_stack.ss_sp = m_stack;
         m_ctx.uc_stack.ss_size = m_stacksize;
     
-        makecontext(&m_ctx, &Fiber::MainFunc, 0);
-
+        if (!use_caller)
+            makecontext(&m_ctx, &Fiber::MainFunc, 0);
+        else
+            // TODO
     
         SATURN_LOG_DEBUG(g_logger) << "Fiber::Fiber id=" << m_id;
     }
