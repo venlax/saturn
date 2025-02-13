@@ -37,8 +37,18 @@ enable_testing()
 #     saturn/thread.cc
 #     saturn/sem.cc
 # ) 
-add_executable(test_fiber
-    tests/test_fiber.cc
+# add_executable(test_fiber
+#     tests/test_fiber.cc
+#     saturn/util.cc
+#     saturn/log.cc
+#     saturn/config.cc
+#     saturn/thread.cc
+#     saturn/sem.cc
+#     saturn/fiber.cc
+# ) 
+add_executable(test_scheduler
+    tests/test_scheduler.cc
+    saturn/scheduler.cc
     saturn/util.cc
     saturn/log.cc
     saturn/config.cc
@@ -62,7 +72,7 @@ add_executable(test_fiber
 #     saturn/sem.cc
 # )
 # target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
-target_link_libraries(test_fiber /usr/local/lib/libyaml-cpp.so)
+target_link_libraries(test_scheduler /usr/local/lib/libyaml-cpp.so)
 # target_link_libraries(test_config /usr/local/lib/libyaml-cpp.so)
 # target_link_libraries(test_thread /usr/local/lib/libyaml-cpp.so)
 

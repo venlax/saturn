@@ -144,7 +144,6 @@ plain_str:
     }
 
     std::string LogFormatter::TimeFormatPattern::str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
-        // TODO
         if (m_type == TimeType::UNIX) {
             return std::to_string(event->getTime());
         } else if (m_type == TimeType::UNIX_MILLIS) {

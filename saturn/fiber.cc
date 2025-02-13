@@ -2,12 +2,13 @@
 
 #include "config.h"
 #include "macro.h"
+#include "scheduler.h"
 #include <ucontext.h>
 
 namespace saturn {
     static Logger::ptr g_logger = LOGGER("system");
 
-    static std::atomic<uint64_t> s_fiber_id {1};
+    static std::atomic<uint64_t> s_fiber_id {1}; // begin with 1, because 0 is the main fiber
     static std::atomic<uint64_t> s_fiber_count {0};
 
     static thread_local Fiber* t_fiber = nullptr;
@@ -45,7 +46,7 @@ namespace saturn {
         if (!use_caller)
             makecontext(&m_ctx, &Fiber::MainFunc, 0);
         else
-            // TODO
+            makecontext(&m_ctx, &Fiber::CallerMainFunc, 0);
     
         SATURN_LOG_DEBUG(g_logger) << "Fiber::Fiber id=" << m_id;
     }
@@ -94,14 +95,30 @@ namespace saturn {
         SetThis(this);
         SATURN_ASSERT(m_state != State::EXEC);
         this->m_state = State::EXEC;
-        if (swapcontext(&t_threadFiber->m_ctx , &this->m_ctx)) {
+        if (swapcontext(&Scheduler::GetMainFiber()->m_ctx , &this->m_ctx)) {
             SATURN_ASSERT(false);
         }
     }
-    void Fiber::swapOut() {
-        SetThis(t_threadFiber.get());
 
-        if(swapcontext(&this->m_ctx, &t_threadFiber->m_ctx)) {
+    void Fiber::swapOut() {
+        SetThis(Scheduler::GetMainFiber());
+
+        if(swapcontext(&this->m_ctx, &Scheduler::GetMainFiber()->m_ctx)) {
+            SATURN_ASSERT(false);
+        }
+    }
+
+    void Fiber::call() {
+        SetThis(this);
+        m_state = State::EXEC;
+        if(swapcontext(&t_threadFiber->m_ctx, &m_ctx)) {
+            SATURN_ASSERT(false);
+        }
+    }
+
+    void Fiber::back() {
+        SetThis(t_threadFiber.get());
+        if(swapcontext(&m_ctx, &t_threadFiber->m_ctx)) {
             SATURN_ASSERT(false);
         }
     }
@@ -114,6 +131,7 @@ namespace saturn {
         if(t_fiber) {
             return t_fiber->shared_from_this();
         }
+        // if there is no fiber, we need to construct a fiber to be the main fiber
         Fiber::ptr main_fiber(new Fiber);
         SATURN_ASSERT(t_fiber == main_fiber.get());
         t_threadFiber = main_fiber;
@@ -156,6 +174,35 @@ namespace saturn {
         raw_ptr->swapOut();
     
         SATURN_ASSERT(false);
+    }
+
+    void Fiber::CallerMainFunc() {
+        using enum State;
+        Fiber::ptr cur = GetThis();
+        SATURN_ASSERT(cur);
+        try {
+            cur->m_cb();
+            cur->m_cb = nullptr;
+            cur->m_state = TERM;
+        } catch (std::exception& ex) {
+            cur->m_state = EXCEPT;
+            SATURN_LOG_ERROR(g_logger) << "Fiber Except: " << ex.what()
+                << " fiber_id=" << cur->getId()
+                << std::endl
+                << saturn::backtraceStr();
+        } catch (...) {
+            cur->m_state = EXCEPT;
+            SATURN_LOG_ERROR(g_logger) << "Fiber Except"
+                << " fiber_id=" << cur->getId()
+                << std::endl
+                << saturn::backtraceStr();
+        }
+    
+        auto raw_ptr = cur.get();
+        cur.reset();
+        raw_ptr->back();
+        SATURN_ASSERT(false);
+    
     }
 
     uint32_t Fiber::GetFiberId() {
