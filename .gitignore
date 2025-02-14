@@ -10,4 +10,3 @@ bin
 cmake
 .cache
 __cmake_systeminformation
-tests/config/*

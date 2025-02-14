@@ -1,0 +1,8 @@
+log:
+  - name: "system"
+    level: "INFO"
+    formatter: "[%p] %F %L thread: %t fiber: %f %e [%c] %d{ISO8601} %m"
+    appenders:
+      - type: "StdoutLogAppender"
+        level: "INFO"
+        formatter: ""
