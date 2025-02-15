@@ -73,13 +73,21 @@ namespace saturn {
     template <typename T>
     concept is_std_container = is_sequence_container<T> || is_associative_container<T>;
 
+
+
     std::string timestampToString(uint64_t timestamp, std::string_view fmt = "%Y-%m-%dT%H:%M:%SZ"); 
-    uint64_t getCurrentTime();
     pid_t getThreadId();
     uint32_t getFiberId();
     void backtrace(std::vector<std::string>& vec, int size, int skip);
     std::string backtraceStr(int size = 64, int skip = 0, std::string_view prefix = "");
-
+    
+    template<typename Unit = std::chrono::seconds>
+    uint64_t getCurrentTime() {
+        auto now = std::chrono::system_clock::now();
+        auto duration = std::chrono::duration_cast<Unit>(now.time_since_epoch());
+        return duration.count();
+    }
+    
     template<class From, class To>
     class cast {
         public:

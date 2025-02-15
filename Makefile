@@ -1,6 +1,6 @@
 BUILD_DIR = build
 
-THREADS = 4  
+THREADS = 8  
 
 all: build
 

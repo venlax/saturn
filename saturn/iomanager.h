@@ -10,8 +10,10 @@
 #include <shared_mutex>
 #include <vector>
 
+#include "timer.h"
 namespace saturn{
-    class IOManager : public Scheduler {
+
+    class IOManager : public Scheduler, public TimerManager {
     public:
         using ptr = std::shared_ptr<IOManager>;
         enum Event {
@@ -58,6 +60,7 @@ namespace saturn{
 
         void contextResize(size_t size);
         bool stopping(uint64_t& time_out);
+        void onTimerInsertedAtFront() override;
     private:
         int m_epfd = 0;
         int m_tickleFds[2];

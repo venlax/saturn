@@ -63,9 +63,20 @@ void test1() {
     iom.schedule(&test_fiber);           
 }
 
-
+saturn::Timer::ptr s_timer;
+void test_timer() {
+    saturn::IOManager iom(2);
+    s_timer = iom.addTimer(1000, [](){
+        static int i = 0;
+        SATURN_LOG_INFO(g_logger) << "hello timer i=" << i;
+        if(++i == 3) {
+            s_timer->reset(2000, true);
+            //s_timer->cancel();
+        }
+    }, true);
+}
 
 int main(int argc, char** argv) {
-    test1();
+    test_timer();
     return 0;
 }

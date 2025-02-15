@@ -254,7 +254,7 @@ namespace saturn {
     }
     bool IOManager::stopping() {
         uint64_t time_out = 0;
-        return Scheduler::stopping();
+        return stopping(time_out);
     }
     void IOManager::idle() {
         SATURN_LOG_INFO(g_logger) << "idle";
@@ -265,7 +265,7 @@ namespace saturn {
         });
         while(true) {
             uint64_t next_timeout = 0;
-            if(stopping()) {
+            if(stopping(next_timeout)) {
                 SATURN_LOG_INFO(g_logger) << "name=" << getName()
                                          << " idle stopping exit";
                 break;
@@ -274,13 +274,13 @@ namespace saturn {
             int rt = 0;
             do {
                 static const int MAX_TIMEOUT = 3000;
-                // if(next_timeout != ~0ull) {
-                //     next_timeout = (int)next_timeout > MAX_TIMEOUT
-                //                     ? MAX_TIMEOUT : next_timeout;
-                // } else {
-                //     next_timeout = MAX_TIMEOUT;
-                // }
-                rt = epoll_wait(m_epfd, events, MAX_EVENTS, MAX_TIMEOUT);
+                if(next_timeout != ~0ull) {
+                    next_timeout = (int)next_timeout > MAX_TIMEOUT
+                                    ? MAX_TIMEOUT : next_timeout;
+                } else {
+                    next_timeout = MAX_TIMEOUT;
+                }
+                rt = epoll_wait(m_epfd, events, MAX_EVENTS, next_timeout);
                 if(rt < 0 && errno == EINTR) {
                 } else {
                     break;
@@ -288,7 +288,7 @@ namespace saturn {
             } while(true);
     
             std::vector<std::function<void()> > cbs;
-            //listExpiredCb(cbs);
+            listExpiredCb(cbs);
             if(!cbs.empty()) {
                 schedule(cbs.begin(), cbs.end());
                 cbs.clear();
@@ -360,12 +360,12 @@ namespace saturn {
     }
 
     bool IOManager::stopping(uint64_t& time_out) {
-        // time_out = getNextTimer();
-        // SATURN_LOG_INFO(g_logger) << "next" << ": " << (time_out == ~0ull
-        // && m_pendingEventCount == 0 
-        // && Scheduler::stopping()) << std::endl; 
         return time_out == ~0ull
             && m_pendingEventCount == 0
             && Scheduler::stopping();
+    }
+
+    void IOManager::onTimerInsertedAtFront() {
+        tickle();
     }
 }
