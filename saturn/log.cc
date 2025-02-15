@@ -1,6 +1,7 @@
 #include "log.h"
 
 
+#include <iomanip>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -144,18 +145,19 @@ plain_str:
     }
 
     std::string LogFormatter::TimeFormatPattern::str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) {
+        std::stringstream ss;
         if (m_type == TimeType::UNIX) {
-            return std::to_string(event->getTime());
+            ss << std::setw(25) << event->getTime();
         } else if (m_type == TimeType::UNIX_MILLIS) {
             std::chrono::seconds sec(event->getTime()); 
             std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(sec);
-            return std::to_string(ms.count());
+            ss << std::setw(25) << ms.count();
         } else if (m_type == TimeType::ISO8601) {
-            return timestampToString(event->getTime());
+            ss << std::setw(25) << timestampToString(event->getTime());
         } else {
-            return timestampToString(event->getTime(), this->m_pattern);
+            ss << std::setw(25) <<  timestampToString(event->getTime(), this->m_pattern);
         }
-        return "";
+        return ss.str();
     }
 
     /*********************************************************/

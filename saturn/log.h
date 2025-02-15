@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <list>
 #include <map>
@@ -99,7 +100,11 @@ namespace saturn {
             public:
                 using ptr = std::shared_ptr<LoggerFormatPattern>;
                 LoggerFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::string{logger_name};};
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(8) << logger_name;
+                    return ss.str();
+                }
         
         };
         class TimeFormatPattern : public FormatPattern {
@@ -141,7 +146,11 @@ namespace saturn {
             public:
                 using ptr = std::shared_ptr<LevelFormatPattern>;
                 LevelFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::string{level_str[static_cast<size_t>(level)]};}
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(6) << level_str[static_cast<size_t>(level)];
+                    return ss.str();
+                }
 
         };
 
@@ -157,7 +166,11 @@ namespace saturn {
             public:
                 using ptr = std::shared_ptr<FileFormatPattern>;
                 FileFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::string{event->getFile()};};
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(50) << event->getFile();
+                    return ss.str();
+                };
             
         };
 
@@ -166,28 +179,44 @@ namespace saturn {
             public:
                 using ptr = std::shared_ptr<LineFormatPattern>;
                 LineFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::to_string(event->getLine());};
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(4) << event->getLine();
+                    return ss.str();
+                };
         };
         class ThreadFormatPattern : public FormatPattern {
             private:
             public:
                 using ptr = std::shared_ptr<ThreadFormatPattern>;
                 ThreadFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::to_string(event->getThreadId());};
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(5) << event->getThreadId();
+                    return ss.str();
+                };
         };
         class FiberFormatPattern : public FormatPattern {
             private:
             public:
                 using ptr = std::shared_ptr<FiberFormatPattern>;
                 FiberFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::to_string(event->getFiberId());};
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(5) << event->getFiberId();
+                    return ss.str();
+                };
         };
         class ElapseFormatPattern : public FormatPattern {
             private:
             public:
                 using ptr = std::shared_ptr<FiberFormatPattern>;
                 ElapseFormatPattern() : FormatPattern("") {}
-                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event) override {return std::to_string(event->getElapse());};
+                std::string str(std::string_view logger_name, LogLevel level, LogEvent::ptr event)override {
+                    std::stringstream ss;
+                    ss << std::left << std::setw(5) << event->getElapse();
+                    return ss.str();
+                };
         };
 
         std::string m_format; // "%m xxx %t xxx"
@@ -293,7 +322,7 @@ namespace saturn {
         std::mutex m_mutex;
         LoggerManager() {
             Logger::ptr root = std::make_shared<Logger>();
-            root->addAppender(std::make_shared<StdoutLogAppender>(LogLevel::INFO, std::make_shared<LogFormatter>("[%p] %F %L thread[%t] fiber[%f] %e [%c] %d{ISO8601} %m")));
+            root->addAppender(std::make_shared<StdoutLogAppender>(LogLevel::INFO, std::make_shared<LogFormatter>("%p %F %L thread[%t] fiber:%f %e %c %d{ISO8601} %m")));
             m_loggers["root"] = root;
         }
     };
