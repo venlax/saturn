@@ -56,6 +56,17 @@ add_executable(test_scheduler
     saturn/sem.cc
     saturn/fiber.cc
 ) 
+add_executable(test_iomanager
+    tests/test_iomanager.cc
+    saturn/iomanager.cc
+    saturn/scheduler.cc
+    saturn/util.cc
+    saturn/log.cc
+    saturn/config.cc
+    saturn/thread.cc
+    saturn/sem.cc
+    saturn/fiber.cc
+) 
 # add_executable(test_config
 #     tests/test_config.cc
 #     saturn/config.cc
@@ -72,8 +83,8 @@ add_executable(test_scheduler
 #     saturn/sem.cc
 # )
 # target_link_libraries(test_log /usr/local/lib/libyaml-cpp.so)
+target_link_libraries(test_iomanager /usr/local/lib/libyaml-cpp.so)
 target_link_libraries(test_scheduler /usr/local/lib/libyaml-cpp.so)
-# target_link_libraries(test_config /usr/local/lib/libyaml-cpp.so)
 # target_link_libraries(test_thread /usr/local/lib/libyaml-cpp.so)
 
 # 注册测试

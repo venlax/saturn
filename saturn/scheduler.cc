@@ -52,7 +52,7 @@ namespace saturn {
 
 
     void Scheduler::start() {
-        LOCK(lock_guard, m_mutex);
+        LOCK(unique_lock, m_mutex);
         if (!m_stopping) {
             return;
         }
@@ -65,6 +65,7 @@ namespace saturn {
                                 , m_name + "_" + std::to_string(i)));
             m_threadIds.push_back(m_threads[i]->getId());
         }
+        UNLOCK();
     }
 
     void Scheduler::stop() {
@@ -219,6 +220,7 @@ namespace saturn {
 
     bool Scheduler::stopping() {
         LOCK(lock_guard, m_mutex);
+        // SATURN_LOG_INFO(g_logger) << m_autoStop << " " << m_stopping << " " << m_fibers.empty() << " " << m_activeThreadCount << std::endl;
         return m_autoStop && m_stopping
             && m_fibers.empty() && m_activeThreadCount == 0;
     }

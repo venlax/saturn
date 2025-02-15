@@ -3,6 +3,7 @@
 #include "config.h"
 #include "macro.h"
 #include "scheduler.h"
+#include "util.h"
 #include <ucontext.h>
 
 namespace saturn {
@@ -27,7 +28,7 @@ namespace saturn {
     
         ++s_fiber_count;
     
-        SATURN_LOG_DEBUG(g_logger) << "Fiber::Fiber main";
+        SATURN_LOG_INFO(g_logger) << "Fiber::Fiber main id=" << m_id;
     }
 
     Fiber::Fiber(std::function<void()> cb, size_t stacksize, bool use_caller) 
@@ -48,7 +49,7 @@ namespace saturn {
         else
             makecontext(&m_ctx, &Fiber::CallerMainFunc, 0);
     
-        SATURN_LOG_DEBUG(g_logger) << "Fiber::Fiber id=" << m_id;
+        SATURN_LOG_INFO(g_logger) << "Fiber::Fiber id=" << m_id;
     }
     Fiber::~Fiber() {
         using enum State;
@@ -68,7 +69,7 @@ namespace saturn {
                 SetThis(nullptr);
             }
         }
-        SATURN_LOG_DEBUG(g_logger) << "Fiber::~Fiber id=" << m_id
+        SATURN_LOG_INFO(g_logger) << "Fiber::~Fiber id=" << m_id
                                   << " total=" << s_fiber_count;
     }
 

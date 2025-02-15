@@ -5,7 +5,7 @@
 
 namespace saturn {
     #define LOCK(guard, mutex) std::guard<decltype(mutex)> lock(mutex)
-
+    #define UNLOCK() lock.unlock() // not frequently use due to RAII
     
     #define SATURN_LOG_LEVEL(logger, level) \
     if(logger->getLevel() <= level) \
