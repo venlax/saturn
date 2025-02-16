@@ -34,7 +34,7 @@ namespace saturn {
     }
     Timer::Timer(uint64_t next) : m_next(next) {}
 
-    bool Timer::cancle() {
+    bool Timer::cancel() {
         LOCK(unique_lock, m_manager->m_mutex);
         if (m_cb) {
             m_cb = nullptr;

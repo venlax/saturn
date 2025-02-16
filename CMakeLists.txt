@@ -17,6 +17,7 @@ set(CMAKE_BUILD_TYPE Debug)
 include_directories(${PROJECT_SOURCE_DIR}/saturn)
 
 set(SOURCES
+    saturn/hook.cc # hook.cc must be the first
     saturn/iomanager.cc
     saturn/timer.cc
     saturn/scheduler.cc
@@ -26,7 +27,6 @@ set(SOURCES
     saturn/thread.cc
     saturn/sem.cc
     saturn/fiber.cc
-    saturn/hook.cc
     saturn/fdmanager.cc
 )
 

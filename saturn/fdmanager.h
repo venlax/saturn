@@ -38,6 +38,10 @@ namespace saturn {
         FdManager();
         FdContext::ptr get(int fd, bool auto_create = false);
         void del(int fd);
+        static FdManager* GetInstance() {
+            static FdManager* ptr = new FdManager();
+            return ptr;
+        }
     private:
         std::shared_mutex m_mutex;
         std::vector<FdContext::ptr> m_datas;

@@ -18,7 +18,7 @@ namespace saturn {
     #define SATURN_LOG_ERROR(logger) SATURN_LOG_LEVEL(logger, saturn::LogLevel::ERROR)
     #define SATURN_LOG_FATAL(logger) SATURN_LOG_LEVEL(logger, saturn::LogLevel::FATAL)
 
-    #define LOGGER(name) saturn::LoggerManager::getInstance()->getLogger(name)
+    #define LOGGER(name) saturn::LoggerManager::GetInstance()->getLogger(name)
     
     #define SATURN_ASSERT(expression) \
             if (!(expression)) { \

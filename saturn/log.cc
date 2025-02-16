@@ -229,7 +229,7 @@ plain_str:
                     appender->log(this->m_name, level, event);
                 }
             } else {
-                LoggerManager::getInstance()->getLogger()->log(level, event);
+                LoggerManager::GetInstance()->getLogger()->log(level, event);
             }
         }
     }
@@ -297,7 +297,7 @@ plain_str:
                         if (!new_value.contains(val)) {
                             Logger::ptr logger = LOGGER(val.name);
                             logger->clearAppenders();
-                            LoggerManager::getInstance()->delLogger(val.name); 
+                            LoggerManager::GetInstance()->delLogger(val.name); 
                         }
                     }
                     return;

@@ -302,7 +302,7 @@ namespace saturn {
 
     class LoggerManager {
     public:
-        static LoggerManager* getInstance() {
+        static LoggerManager* GetInstance() {
             static LoggerManager* instance = new LoggerManager();
             return instance; 
         }

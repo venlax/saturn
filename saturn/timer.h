@@ -13,7 +13,7 @@ namespace saturn {
     friend class TimerManager;
     public:
         using ptr = std::shared_ptr<Timer>;
-        bool cancle();
+        bool cancel();
         bool refresh();
         bool reset(uint64_t ms, bool from_now);
     private:
