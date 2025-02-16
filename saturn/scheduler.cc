@@ -1,6 +1,7 @@
 #include "scheduler.h"
 
 #include "fiber.h"
+#include "hook.h"
 #include "log.h"
 #include "macro.h"
 #include "util.h"
@@ -124,7 +125,7 @@ namespace saturn {
         }
         Fiber::ptr idle_fiber(new Fiber(std::bind(&Scheduler::idle, this)));
         Fiber::ptr cb_fiber;
-        
+        set_hook_enable(true);
         FiberAndThread ft;
 
         while (true) {

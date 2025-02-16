@@ -27,6 +27,7 @@ set(SOURCES
     saturn/sem.cc
     saturn/fiber.cc
     saturn/hook.cc
+    saturn/fdmanager.cc
 )
 
 # 启用测试

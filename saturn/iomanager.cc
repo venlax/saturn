@@ -103,7 +103,7 @@ namespace saturn {
 
         int op = fc->events ? EPOLL_CTL_MOD : EPOLL_CTL_ADD;
         epoll_event epevent;
-        epevent.events = EPOLLET | fc->events | event;
+        epevent.events = EPOLLET | static_cast<unsigned>(fc->events) | static_cast<unsigned>(event);
         epevent.data.ptr = fc;
         int rt = epoll_ctl(m_epfd, op, fd, &epevent);
 
@@ -151,7 +151,7 @@ namespace saturn {
         Event new_event = static_cast<Event>(fc->events & ~event);
         int op = new_event ? EPOLL_CTL_MOD : EPOLL_CTL_DEL;
         epoll_event epevent;
-        epevent.events = EPOLLIN | new_event;
+        epevent.events = EPOLLIN | static_cast<unsigned>(new_event);
         epevent.data.ptr = fc;
         int rt = epoll_ctl(m_epfd, op, fd, &epevent);
         if(rt) {
@@ -186,7 +186,7 @@ namespace saturn {
         Event new_event = static_cast<Event>(fc->events & ~event);
         int op = new_event ? EPOLL_CTL_MOD : EPOLL_CTL_DEL;
         epoll_event epevent;
-        epevent.events = EPOLLIN | new_event;
+        epevent.events = EPOLLIN | static_cast<unsigned>(new_event);
         epevent.data.ptr = fc;
         int rt = epoll_ctl(m_epfd, op, fd, &epevent);
         if(rt) {
