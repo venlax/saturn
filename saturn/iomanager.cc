@@ -360,6 +360,7 @@ namespace saturn {
     }
 
     bool IOManager::stopping(uint64_t& time_out) {
+        time_out = getNextTimer();
         return time_out == ~0ull
             && m_pendingEventCount == 0
             && Scheduler::stopping();

@@ -26,17 +26,18 @@ set(SOURCES
     saturn/thread.cc
     saturn/sem.cc
     saturn/fiber.cc
+    saturn/hook.cc
 )
 
 # 启用测试
 enable_testing()
 
-add_executable(test_iomanager
-    tests/test_iomanager.cc
+add_executable(test_hook
+    tests/test_hook.cc
     ${SOURCES}
 ) 
 
-target_link_libraries(test_iomanager /usr/local/lib/libyaml-cpp.so)
+target_link_libraries(test_hook /usr/local/lib/libyaml-cpp.so dl)
 
 # 注册测试
 # add_test(NAME TestConfig COMMAND test_config)
