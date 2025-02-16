@@ -18,6 +18,7 @@ include_directories(${PROJECT_SOURCE_DIR}/saturn)
 
 set(SOURCES
     saturn/hook.cc # hook.cc must be the first
+    saturn/address.cc
     saturn/iomanager.cc
     saturn/timer.cc
     saturn/scheduler.cc

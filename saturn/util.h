@@ -21,7 +21,7 @@
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/yaml.h>
 
-
+#include <byteswap.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -73,7 +73,14 @@ namespace saturn {
     template <typename T>
     concept is_std_container = is_sequence_container<T> || is_associative_container<T>;
 
+    template <typename T>
+    concept is_16_bits_type = (sizeof(T) == sizeof(uint16_t)) && std::is_trivial_v<T>; 
 
+    template <typename T>
+    concept is_32_bits_type = sizeof(T) == sizeof(uint32_t) && std::is_trivial_v<T>;  
+
+    template <typename T>
+    concept is_64_bits_type = sizeof(T) == sizeof(uint64_t) && std::is_trivial_v<T>;  
 
     std::string timestampToString(uint64_t timestamp, std::string_view fmt = "%Y-%m-%dT%H:%M:%SZ"); 
     pid_t getThreadId();
@@ -211,6 +218,40 @@ namespace saturn {
                 
         }
     };
+    template<is_16_bits_type T>
+    T byteswap(T value) {
+        return static_cast<T>(bswap_16((uint16_t)value));
+    }
+    template<is_32_bits_type T>
+    T byteswap(T value) {
+        return static_cast<T>(bswap_32((uint16_t)value));
+    }
+    template<is_64_bits_type T>
+    T byteswap(T value) {
+        return static_cast<T>(bswap_64((uint16_t)value));
+    }
+
+    #if BYTE_ORDER == LITTLE_ENDIAN
+    template<class T>
+    T byteswapOnLittleEndian(T t) {
+        return byteswap(t);
+    }
+
+    template<class T>
+    T byteswapOnBigEndian(T t) {
+        return t;
+    }
+    #else
+    template<class T>
+    T byteswapOnLittleEndian(T t) {
+        return t;
+    }
+
+    template<class T>
+    T byteswapOnBigEndian(T t) {
+        return byteswap(t);
+    }
+    #endif
 }
 
 #endif // !__SATURN_UTIL_H__
