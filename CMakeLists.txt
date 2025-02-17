@@ -34,12 +34,12 @@ set(SOURCES
 # 启用测试
 enable_testing()
 
-add_executable(test_hook
-    tests/test_hook.cc
+add_executable(test_address
+    tests/test_address.cc
     ${SOURCES}
 ) 
 
-target_link_libraries(test_hook /usr/local/lib/libyaml-cpp.so dl)
+target_link_libraries(test_address /usr/local/lib/libyaml-cpp.so dl)
 
 # 注册测试
 # add_test(NAME TestConfig COMMAND test_config)
