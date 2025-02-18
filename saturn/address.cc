@@ -1,12 +1,14 @@
 #include "address.h"
 
-#include <arpa/inet.h>
 #include <cstddef>
 #include <cstring>
+#include <sstream>
+
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <netdb.h>
-#include <sstream>
 #include <sys/socket.h>
+
 
 #include "log.h"
 #include "util.h"
