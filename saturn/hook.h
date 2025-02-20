@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <time.h>
+#include <stdint.h>
 #include <unistd.h>
 
 
@@ -80,6 +81,8 @@ extern "C" {
 
     using setsockopt_fun =  int (*)(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
     extern setsockopt_fun setsockopt_f;
+
+    int connect_with_timeout(int fd, const struct sockaddr* addr, socklen_t addrlen, uint64_t timeout_ms);
 }
 
 #endif // !__SATURN_HOOK_H__

@@ -271,7 +271,7 @@ namespace saturn {
 
     IPv4Address::IPv4Address(const sockaddr_in& address) : m_addr(address) {}        
     
-    IPv4Address::IPv4Address(uint32_t address, uint32_t port) {
+    IPv4Address::IPv4Address(uint32_t address, uint16_t port) {
         ::memset(&m_addr, 0, sizeof(m_addr));
         m_addr.sin_addr.s_addr = byteswapOnLittleEndian(address);
         m_addr.sin_port = byteswapOnLittleEndian(port);
@@ -337,7 +337,7 @@ namespace saturn {
     }
 
     uint32_t IPv4Address::getPort() const {return byteswapOnLittleEndian(m_addr.sin_port);}
-    void IPv4Address::setPort(uint32_t v) {m_addr.sin_port = byteswapOnLittleEndian(v);} 
+    void IPv4Address::setPort(uint16_t v) {m_addr.sin_port = byteswapOnLittleEndian(v);} 
 
     IPv6Address::ptr IPv6Address::Create(const char* address, uint16_t port) {
         IPv6Address::ptr rt(new IPv6Address);
@@ -430,7 +430,7 @@ namespace saturn {
     }
 
     uint32_t IPv6Address::getPort() const {return byteswapOnLittleEndian(m_addr.sin6_port);}
-    void IPv6Address::setPort(uint32_t v) {m_addr.sin6_port = byteswapOnLittleEndian(v);} 
+    void IPv6Address::setPort(uint16_t v) {m_addr.sin6_port = byteswapOnLittleEndian(v);} 
 
     UnixAddress::UnixAddress() {
         memset(&m_addr, 0, sizeof(m_addr));  

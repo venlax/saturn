@@ -224,11 +224,11 @@ namespace saturn {
     }
     template<is_32_bits_type T>
     T byteswap(T value) {
-        return static_cast<T>(bswap_32((uint16_t)value));
+        return static_cast<T>(bswap_32((uint32_t)value));
     }
     template<is_64_bits_type T>
     T byteswap(T value) {
-        return static_cast<T>(bswap_64((uint16_t)value));
+        return static_cast<T>(bswap_64((uint64_t)value));
     }
 
     #if BYTE_ORDER == LITTLE_ENDIAN

@@ -60,7 +60,7 @@ namespace saturn {
         virtual IPAddress::ptr subnetMask(uint32_t prefix_len) = 0;
         
         virtual uint32_t getPort() const = 0;
-        virtual void setPort(uint32_t v) = 0;
+        virtual void setPort(uint16_t v) = 0;
     };
 
     class IPv4Address : public IPAddress {
@@ -68,7 +68,7 @@ namespace saturn {
         using ptr = std::shared_ptr<IPv4Address>;
         
         IPv4Address(const sockaddr_in& address);
-        IPv4Address(uint32_t address = INADDR_ANY, uint32_t port = 0);
+        IPv4Address(uint32_t address = INADDR_ANY, uint16_t port = 0);
         static IPv4Address::ptr Create(const char* address, uint16_t port = 0);
 
         const sockaddr* getAddr() const override;
@@ -80,7 +80,7 @@ namespace saturn {
         IPAddress::ptr networdAddress(uint32_t prefix_len) override;
         IPAddress::ptr subnetMask(uint32_t prefix_len) override;
         uint32_t getPort() const override;
-        void setPort(uint32_t v) override; 
+        void setPort(uint16_t v) override; 
     private:
         sockaddr_in m_addr;
     };
@@ -103,7 +103,7 @@ namespace saturn {
         IPAddress::ptr networdAddress(uint32_t prefix_len) override;
         IPAddress::ptr subnetMask(uint32_t prefix_len) override;
         uint32_t getPort() const override;
-        void setPort(uint32_t v) override; 
+        void setPort(uint16_t v) override; 
     private:
         sockaddr_in6 m_addr;
     };

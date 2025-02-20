@@ -19,6 +19,7 @@ include_directories(${PROJECT_SOURCE_DIR}/saturn)
 set(SOURCES
     saturn/hook.cc # hook.cc must be the first
     saturn/address.cc
+    saturn/socket.cc
     saturn/iomanager.cc
     saturn/timer.cc
     saturn/scheduler.cc
@@ -34,11 +35,16 @@ set(SOURCES
 # 启用测试
 enable_testing()
 
+add_executable(test_socket
+    tests/test_socket.cc
+    ${SOURCES}
+) 
 add_executable(test_address
     tests/test_address.cc
     ${SOURCES}
 ) 
 
+target_link_libraries(test_socket /usr/local/lib/libyaml-cpp.so dl)
 target_link_libraries(test_address /usr/local/lib/libyaml-cpp.so dl)
 
 # 注册测试
