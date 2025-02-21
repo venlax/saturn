@@ -1,7 +1,5 @@
 #include "bytearray.h"
 
-
-
 #include <cstdlib>
 #include <stdexcept>
 

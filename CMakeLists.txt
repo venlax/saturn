@@ -21,6 +21,11 @@ set(SOURCES
     saturn/address.cc
     saturn/socket.cc
     saturn/iomanager.cc
+    saturn/http/external/mongrel2/bstr/bstraux.cc
+    saturn/http/external/mongrel2/bstr/bstrlib.cc
+    saturn/http/external/mongrel2/dbg.cc
+    saturn/http/external/mongrel2/http/http11_parser.cc
+    saturn/http/external/mongrel2/http/httpclient_parser.cc
     saturn/timer.cc
     saturn/scheduler.cc
     saturn/util.cc
