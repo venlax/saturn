@@ -30,6 +30,7 @@ set(SOURCES
     saturn/sem.cc
     saturn/fiber.cc
     saturn/fdmanager.cc
+    saturn/bytearray.cc
 )
 
 # 启用测试
@@ -43,9 +44,15 @@ add_executable(test_address
     tests/test_address.cc
     ${SOURCES}
 ) 
+add_executable(test_bytearray
+    tests/test_bytearray.cc
+    ${SOURCES}
+) 
+
 
 target_link_libraries(test_socket /usr/local/lib/libyaml-cpp.so dl)
 target_link_libraries(test_address /usr/local/lib/libyaml-cpp.so dl)
+target_link_libraries(test_bytearray /usr/local/lib/libyaml-cpp.so dl)
 
 # 注册测试
 # add_test(NAME TestConfig COMMAND test_config)
