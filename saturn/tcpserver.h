@@ -11,7 +11,7 @@ namespace saturn {
 
     class TcpServer : public std::enable_shared_from_this<TcpServer> {
     public:
-        typedef std::shared_ptr<TcpServer> ptr;
+        using ptr = std::shared_ptr<TcpServer>;
         TcpServer(saturn::IOManager* woker = saturn::IOManager::GetThis()
                 ,saturn::IOManager* accept_woker = saturn::IOManager::GetThis());
         virtual ~TcpServer();

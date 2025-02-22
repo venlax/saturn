@@ -7,6 +7,8 @@ project(Saturn VERSION 1.0)
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 20)  # 使用 C++20 , partial 😀
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+
 find_package(yaml-cpp REQUIRED)
 
 add_compile_options(-rdynamic)
@@ -27,8 +29,11 @@ set(SOURCES
     saturn/http/external/mongrel2/http/http11_parser.cc
     saturn/http/external/mongrel2/http/httpclient_parser.cc
     saturn/http/http_parser.cc
+    saturn/http/http_session.cc
     saturn/http/http.cc
     saturn/tcpserver.cc
+    saturn/stream.cc
+    saturn/stream/socketstream.cc
     saturn/timer.cc
     saturn/scheduler.cc
     saturn/util.cc

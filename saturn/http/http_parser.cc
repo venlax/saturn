@@ -18,6 +18,9 @@ namespace http {
 
     static uint64_t s_http_request_buffer_size = 0;
     static uint64_t s_http_request_max_body_size = 0;
+    static uint64_t s_http_response_buffer_size = 0;
+    static uint64_t s_http_response_max_body_size = 0;
+                    
 
     struct _RequestSizeIniter {
         _RequestSizeIniter() {
@@ -217,6 +220,23 @@ namespace http {
     uint64_t HttpResponseParser::getContentLength() {
         return m_data->getHeaderAs<uint64_t>("content-length", 0);
     }
+
+    uint64_t HttpRequestParser::GetHttpRequestBufferSize() {
+        return s_http_request_buffer_size;
+    }
+    
+    uint64_t HttpRequestParser::GetHttpRequestMaxBodySize() {
+        return s_http_request_max_body_size;
+    }
+    
+    uint64_t HttpResponseParser::GetHttpResponseBufferSize() {
+        return s_http_response_buffer_size;
+    }
+    
+    uint64_t HttpResponseParser::GetHttpResponseMaxBodySize() {
+        return s_http_response_max_body_size;
+    }
+    
 
 }
 }
