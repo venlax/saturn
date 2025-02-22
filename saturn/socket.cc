@@ -71,7 +71,7 @@ namespace saturn {
     }
 
     Socket::~Socket() {
-
+        close();
     }
 
     
@@ -177,6 +177,7 @@ namespace saturn {
 
     }
     bool Socket::connect(const Address::ptr addr, uint64_t timeout_ms) {
+        m_remoteAddress = addr;
         if (!isValid()) {
             newSock();
             if (!isValid()) {
@@ -276,7 +277,7 @@ namespace saturn {
         return -1;
     }
 
-    int Socket::recv(iovec* buffers, size_t length, Address::ptr from, int flags) {
+    int Socket::recv(iovec* buffers, size_t length, int flags) {
         if (isConnected()) {
             msghdr msg;
             memset(&msg, 0, sizeof(msg));
@@ -415,7 +416,7 @@ namespace saturn {
         return m_sock;
     }
 
-    bool Socket::cancelHead() {
+    bool Socket::cancelRead() {
         return IOManager::GetThis()->cancelEvent(m_sock, IOManager::Event::READ);
     }
     bool Socket::cancelWrite() {
@@ -446,4 +447,8 @@ namespace saturn {
         }
     }
 
+    std::ostream& operator<<(std::ostream& os, const Socket& sock) {
+        return sock.dump(os);
+    }
+    
 }

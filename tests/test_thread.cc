@@ -43,7 +43,6 @@ void fun3() {
 
 int main(int argc, char** argv) {
     SATURN_LOG_INFO(g_logger) << "thread test begin";
-    // YAML::Node root = YAML::LoadFile("/home/sylar/test/sylar/bin/conf/log2.yml");
     // Config::loadFromYaml(root);
 
     std::vector<Thread::ptr> thrs;

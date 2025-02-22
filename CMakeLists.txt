@@ -26,6 +26,9 @@ set(SOURCES
     saturn/http/external/mongrel2/dbg.cc
     saturn/http/external/mongrel2/http/http11_parser.cc
     saturn/http/external/mongrel2/http/httpclient_parser.cc
+    saturn/http/http_parser.cc
+    saturn/http/http.cc
+    saturn/tcpserver.cc
     saturn/timer.cc
     saturn/scheduler.cc
     saturn/util.cc
@@ -41,23 +44,47 @@ set(SOURCES
 # 启用测试
 enable_testing()
 
-add_executable(test_socket
-    tests/test_socket.cc
+# add_executable(test_socket
+#     tests/test_socket.cc
+#     ${SOURCES}
+# ) 
+# add_executable(test_address
+#     tests/test_address.cc
+#     ${SOURCES}
+# ) 
+# add_executable(test_bytearray
+#     tests/test_bytearray.cc
+#     ${SOURCES}
+# ) 
+
+# add_executable(test_httpparser
+#     tests/test_httpparser.cc
+#     ${SOURCES}
+# ) 
+# add_executable(test_http
+#     tests/test_http.cc
+#     ${SOURCES}
+# ) 
+# add_executable(test_tcpserver
+#     tests/test_tcpserver.cc
+#     ${SOURCES}
+# ) 
+
+add_executable(echoserver
+    tests/examples/echoserver.cc
     ${SOURCES}
-) 
-add_executable(test_address
-    tests/test_address.cc
-    ${SOURCES}
-) 
-add_executable(test_bytearray
-    tests/test_bytearray.cc
-    ${SOURCES}
-) 
+)
 
 
-target_link_libraries(test_socket /usr/local/lib/libyaml-cpp.so dl)
-target_link_libraries(test_address /usr/local/lib/libyaml-cpp.so dl)
-target_link_libraries(test_bytearray /usr/local/lib/libyaml-cpp.so dl)
+# target_link_libraries(test_socket /usr/local/lib/libyaml-cpp.so dl)
+# target_link_libraries(test_address /usr/local/lib/libyaml-cpp.so dl)
+# target_link_libraries(test_bytearray /usr/local/lib/libyaml-cpp.so dl)
+# target_link_libraries(test_httpparser /usr/local/lib/libyaml-cpp.so dl)
+# target_link_libraries(test_http /usr/local/lib/libyaml-cpp.so dl)
+# target_link_libraries(test_tcpserver /usr/local/lib/libyaml-cpp.so dl)
+target_link_libraries(echoserver /usr/local/lib/libyaml-cpp.so dl)
+
+
 
 # 注册测试
 # add_test(NAME TestConfig COMMAND test_config)

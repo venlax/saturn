@@ -102,7 +102,6 @@ namespace saturn {
                 next = results;
                 while(next) {
                     result.push_back(Create(next->ai_addr, (socklen_t)next->ai_addrlen));
-                    //SYLAR_LOG_INFO(g_logger) << ((sockaddr_in*)next->ai_addr)->sin_addr.s_addr;
                     next = next->ai_next;
                 }
             

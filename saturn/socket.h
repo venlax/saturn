@@ -87,7 +87,7 @@ namespace saturn {
         int sendTo(const iovec* buffers, size_t length, Address::ptr to, int flags = 0);
         
         int recv(void* buffer, size_t length, int flags = 0);
-        int recv(iovec* buffers, size_t length, Address::ptr from, int flags = 0);
+        int recv(iovec* buffers, size_t length,  int flags = 0);
         int recvFrom(void* buffer, size_t length, Address::ptr from, int flags = 0);
         int recvFrom(iovec* buffers, size_t length, Address::ptr from, int flags = 0);
         
@@ -105,10 +105,11 @@ namespace saturn {
         std::ostream& dump(std::ostream& os) const;
         int getSocket() const;
 
-        bool cancelHead();
+        bool cancelRead();
         bool cancelWrite();
         bool cancelAccept();
         bool cancelAll();
+
     
     private:
         void initSock();
@@ -123,6 +124,8 @@ namespace saturn {
         Address::ptr m_localAddress;
         Address::ptr m_remoteAddress;
     };
+
+    std::ostream& operator<<(std::ostream& os, const Socket& addr);
 }
 
 #endif // !__SATURN_SOCKET_H__
