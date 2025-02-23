@@ -1,5 +1,5 @@
 #ifndef __SATURN_SOCKETSTREAM_H__
-
+#define __SATURN_SOCKETSTREAM_H__
 #include "iomanager.h"
 #include "socket.h"
 #include "stream.h"

@@ -1,4 +1,6 @@
 #ifndef __SATURN_HTTP_SESSION_H__
+#define __SATURN_HTTP_SESSION_H__
+
 
 #include "http.h"
 #include "stream/socketstream.h"

@@ -30,6 +30,8 @@ set(SOURCES
     saturn/http/external/mongrel2/http/httpclient_parser.cc
     saturn/http/http_parser.cc
     saturn/http/http_session.cc
+    saturn/http/http_server.cc
+    saturn/http/servlet.cc
     saturn/http/http.cc
     saturn/tcpserver.cc
     saturn/stream.cc
@@ -75,8 +77,12 @@ enable_testing()
 #     ${SOURCES}
 # ) 
 
-add_executable(echoserver
-    tests/examples/echoserver.cc
+# add_executable(echoserver
+#     tests/examples/echoserver.cc
+#     ${SOURCES}
+# )
+add_executable(test_http_server
+    tests/test_http_server.cc
     ${SOURCES}
 )
 
@@ -87,7 +93,7 @@ add_executable(echoserver
 # target_link_libraries(test_httpparser /usr/local/lib/libyaml-cpp.so dl)
 # target_link_libraries(test_http /usr/local/lib/libyaml-cpp.so dl)
 # target_link_libraries(test_tcpserver /usr/local/lib/libyaml-cpp.so dl)
-target_link_libraries(echoserver /usr/local/lib/libyaml-cpp.so dl)
+target_link_libraries(test_http_server /usr/local/lib/libyaml-cpp.so dl)
 
 
 

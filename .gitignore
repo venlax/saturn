@@ -3,6 +3,7 @@
 bin/*
 build/*
 cmake/*
+path/*
 **/.clangd
 .vscode
 build
