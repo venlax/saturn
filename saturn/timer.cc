@@ -113,7 +113,7 @@ namespace saturn {
         return 0;
     }
     void TimerManager::listExpiredCb(std::vector<std::function<void()> >& cbs) {    
-        LOCK(shared_lock, m_mutex);
+        LOCK(unique_lock, m_mutex);
         if (m_timers.empty())
             return;
         std::vector<Timer::ptr> expired;

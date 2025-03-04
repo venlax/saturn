@@ -226,7 +226,9 @@ namespace http {
             httpclient_parser_init(&m_parser);
         }
         size_t offset = httpclient_parser_execute(&m_parser, data, len, 0);
-    
+        // std::cout << len << " " << offset << std::endl;
+        // There may have some bug, I don't know why need to minus 1
+        offset -= 1;
         memmove(data, data + offset, (len - offset));
         return offset;
     }

@@ -38,23 +38,30 @@ HttpResponse::ptr HttpConnection::recvResponse() {
     int offset = 0;
     do {
         int len = read(data + offset, buff_size - offset);
+        //std::cout << "read recv " << len << " bytes" << std::endl;
         if(len <= 0) {
             close();
             return nullptr;
         }
         len += offset;
+        // This is necessary
         data[len] = '\0';
+        //std::cout << data << std::endl;
         size_t nparse = parser->execute(data, len, false);
+        //std::cout << "nparse" << nparse << std::endl;
         if(parser->hasError()) {
+            
             close();
             return nullptr;
         }
         offset = len - nparse;
         if(offset == (int)buff_size) {
+            
             close();
             return nullptr;
         }
         if(parser->isFinished()) {
+            //std::cout << "finished" << std::endl;
             break;
         }
     } while(true);
@@ -66,6 +73,7 @@ HttpResponse::ptr HttpConnection::recvResponse() {
             do {
                 int rt = read(data + len, buff_size - len);
                 if(rt <= 0) {
+            
                     close();
                     return nullptr;
                 }
@@ -73,11 +81,13 @@ HttpResponse::ptr HttpConnection::recvResponse() {
                 data[len] = '\0';
                 size_t nparse = parser->execute(data, len, true);
                 if(parser->hasError()) {
+            
                     close();
                     return nullptr;
                 }
                 len -= nparse;
                 if(len == (int)buff_size) {
+            
                     close();
                     return nullptr;
                 }
@@ -96,6 +106,7 @@ HttpResponse::ptr HttpConnection::recvResponse() {
                 while(left > 0) {
                     int rt = read(data, left > (int)buff_size ? (int)buff_size : left);
                     if(rt <= 0) {
+
                         close();
                         return nullptr;
                     }
@@ -108,10 +119,11 @@ HttpResponse::ptr HttpConnection::recvResponse() {
         parser->getData()->setBody(body);
     } else {
         int64_t length = parser->getContentLength();
+        //std::cout << length << " " << offset << std::endl;
         if(length > 0) {
             std::string body;
             body.resize(length);
-
+            //std::cout << data << std::endl;
             int len = 0;
             if(length >= offset) {
                 memcpy(&body[0], data, offset);
@@ -120,9 +132,11 @@ HttpResponse::ptr HttpConnection::recvResponse() {
                 memcpy(&body[0], data, length);
                 len = length;
             }
+            // std::cout << body << std::endl;
             length -= offset;
             if(length > 0) {
                 if(readFixSize(&body[len], length) <= 0) {
+                    //std::cout << "here" << std::endl;
                     close();
                     return nullptr;
                 }

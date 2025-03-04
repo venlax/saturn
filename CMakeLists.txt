@@ -82,8 +82,8 @@ enable_testing()
 #     tests/examples/echoserver.cc
 #     ${SOURCES}
 # )
-add_executable(test_http_server
-    tests/test_http_server.cc
+add_executable(test_http_connection
+    tests/test_http_connection.cc
     ${SOURCES}
 )
 
@@ -94,7 +94,7 @@ add_executable(test_http_server
 # target_link_libraries(test_httpparser /usr/local/lib/libyaml-cpp.so dl)
 # target_link_libraries(test_http /usr/local/lib/libyaml-cpp.so dl)
 # target_link_libraries(test_tcpserver /usr/local/lib/libyaml-cpp.so dl)
-target_link_libraries(test_http_server /usr/local/lib/libyaml-cpp.so dl)
+target_link_libraries(test_http_connection /usr/local/lib/libyaml-cpp.so dl)
 
 
 
