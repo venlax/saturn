@@ -18,7 +18,7 @@ namespace http {
 
         HttpRequest::ptr getData() const { return m_data;}
         void setError(int v) { m_error = v;}
-
+        const http_parser& getParser() const { return m_parser;}
         uint64_t getContentLength();
 
         static uint64_t GetHttpRequestBufferSize();
@@ -37,7 +37,7 @@ namespace http {
     public:
         using ptr = std::shared_ptr<HttpResponseParser>;
         HttpResponseParser();
-        size_t execute(char* data, size_t len);
+        size_t execute(char* data, size_t len, bool chunk);
         int isFinished();
         int hasError(); 
 

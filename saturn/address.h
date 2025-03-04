@@ -137,5 +137,7 @@ namespace saturn {
     private:
         sockaddr m_addr;
     };
+
+    std::ostream& operator<<(std::ostream& os, const Address& addr);
 }
 #endif // !__SATURN_ADDRESS_H__

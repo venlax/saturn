@@ -413,6 +413,7 @@ extern "C" {
                 va_end(va);
                 return fcntl_f(fd, cmd);
         }
+        return -1;
     }
 
 

@@ -7,7 +7,7 @@ project(Saturn VERSION 1.0)
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 20)  # 使用 C++20 , partial 😀
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -fsanitize=address")
 
 find_package(yaml-cpp REQUIRED)
 
@@ -17,7 +17,6 @@ add_compile_options(-rdynamic)
 set(CMAKE_BUILD_TYPE Debug)
 # 指定源文件所在目录
 include_directories(${PROJECT_SOURCE_DIR}/saturn)
-
 set(SOURCES
     saturn/hook.cc # hook.cc must be the first
     saturn/address.cc
@@ -31,9 +30,11 @@ set(SOURCES
     saturn/http/http_parser.cc
     saturn/http/http_session.cc
     saturn/http/http_server.cc
+    saturn/http/http_connection.cc
     saturn/http/servlet.cc
     saturn/http/http.cc
     saturn/tcpserver.cc
+    saturn/uri.cc
     saturn/stream.cc
     saturn/stream/socketstream.cc
     saturn/timer.cc

@@ -31,9 +31,12 @@ namespace http {
         rsp->setHeader("Server", getName());
         m_dispatch->handle(req, rsp, session);
         session->sendResponse(rsp);
-        } while(m_isKeepalive);
-        session->close();
+        if (!m_isKeepalive || req->isClose()) {
+            break;
         }
+    } while(true);
+    session->close();
+    }
 
 
 

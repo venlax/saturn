@@ -1,4 +1,6 @@
 #include "stream/socketstream.h"
+#include "util.h"
+
 
 namespace saturn {
     SocketStream::SocketStream(Socket::ptr sock, bool owner)

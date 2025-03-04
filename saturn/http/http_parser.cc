@@ -15,7 +15,14 @@ namespace http {
     static saturn::ConfigVar<uint64_t>::ptr g_http_request_max_body_size =
         saturn::Config::add("http.request.max_body_size"
                     ,(uint64_t)(64 * 1024 * 1024), "http request max body size");
+    static saturn::ConfigVar<uint64_t>::ptr g_http_response_buffer_size =
+    saturn::Config::add("http.response.buffer_size"
+                ,(uint64_t)(4 * 1024), "http response buffer size");
 
+    static saturn::ConfigVar<uint64_t>::ptr g_http_response_max_body_size =
+    saturn::Config::add("http.response.max_body_size"
+                ,(uint64_t)(64 * 1024 * 1024), "http response max body size");
+                
     static uint64_t s_http_request_buffer_size = 0;
     static uint64_t s_http_request_max_body_size = 0;
     static uint64_t s_http_response_buffer_size = 0;
@@ -26,7 +33,8 @@ namespace http {
         _RequestSizeIniter() {
             s_http_request_buffer_size = g_http_request_buffer_size->getValue();
             s_http_request_max_body_size = g_http_request_max_body_size->getValue();
-
+            s_http_response_buffer_size = g_http_response_buffer_size->getValue();
+            s_http_response_max_body_size = g_http_response_max_body_size->getValue();
             g_http_request_buffer_size->addListener(
                     [](const uint64_t& ov, const uint64_t& nv){
                     s_http_request_buffer_size = nv;
@@ -35,6 +43,16 @@ namespace http {
             g_http_request_max_body_size->addListener(
                     [](const uint64_t& ov, const uint64_t& nv){
                     s_http_request_max_body_size = nv;
+            });
+
+            g_http_response_buffer_size->addListener(
+                [](const uint64_t& ov, const uint64_t& nv){
+                s_http_response_buffer_size = nv;
+            });
+
+            g_http_response_max_body_size->addListener(
+                    [](const uint64_t& ov, const uint64_t& nv){
+                    s_http_response_max_body_size = nv;
             });
         }
     };
@@ -182,7 +200,7 @@ namespace http {
         HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
         if(flen == 0) {
             SATURN_LOG_WARN(g_logger) << "invalid http response field length == 0";
-            parser->setError(1002);
+            //parser->setError(1002);
             return;
         }
         parser->getData()->setHeader(std::string(field, flen)
@@ -203,8 +221,12 @@ namespace http {
         m_parser.data = this;
     }
 
-    size_t HttpResponseParser::execute(char* data, size_t len) {
+    size_t HttpResponseParser::execute(char* data, size_t len, bool chunk) {
+        if(chunk) {
+            httpclient_parser_init(&m_parser);
+        }
         size_t offset = httpclient_parser_execute(&m_parser, data, len, 0);
+    
         memmove(data, data + offset, (len - offset));
         return offset;
     }
